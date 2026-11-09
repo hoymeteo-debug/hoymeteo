@@ -1,0 +1,109 @@
+# Proyecto @hoymeteo
+
+Cuentas de Instagram y TikTok `@hoymeteo` que publican cada mañana (07:00–07:30) el tiempo
+de hoy en España en forma de rankings. Dueño: Víctor. Idioma de trabajo: español, tuteo,
+directo y sin preámbulos. Código modular, documentado y listo para producción.
+
+**Objetivo final: cero trabajo diario para Víctor.** Datos, imágenes, textos, publicación en
+Instagram y TikTok y programación, todo automático. Víctor solo hace la configuración inicial y
+recibe un aviso únicamente si algo falla. "Súbelo a mano" no es una solución válida, solo un
+paso provisional mientras llega una aprobación.
+
+## Estado actual
+
+Ya existe un generador en Python que, con la previsión de AEMET, crea para cuatro
+series (`max`, `min`, `rain`, `wind`): carrusel 1080×1350 (podio + top 30), story 1080×1920 y
+`caption.txt`.
+
+**Validado contra la API real (9-nov-2026):** el esquema de la horaria coincide (`temperatura`,
+`precipitacion`, `vientoAndRachaMax` con `value` = racha). Máx/mín se toman de la previsión
+**diaria** (`temperatura.maxima/minima`), porque la horaria del primer día empieza en la hora de
+elaboración y además da valores más bajos que la oficial (Madrid: 16° horaria vs 18° diaria).
+Lluvia y rachas, de la horaria. Los 112 municipios de `municipios.csv` se resuelven. Una
+ejecución completa son 448 llamadas (~16 min reales; empezar a las 06:15 como tarde). Pruebas: `python -m pytest` (fixtures reales en
+`tests/fixtures/`). Pendiente: confirmar a qué hora sale la pasada de las 00 UTC.
+
+Archivos: `run.py` (CLI), `config.py` (series, colores, textos), `aemet_client.py` (cliente y
+parser), `data_sources.py` (datos reales/demo y rankings), `render.py` (Pillow), `captions.py`,
+`municipios.csv` (≈110 municipios, código INE de provincia), `README.md`.
+
+## Decisiones ya tomadas (no cambiar sin preguntar)
+
+- **Titulares en frase:** "Hoy hará más calor en", "Hoy hará más frío en", "Hoy lloverá más en",
+  "Hoy hará más viento en", "Hoy nevará más en / se podrá esquiar más en".
+- **Datos de previsión de hoy**, no medidos, para poder publicar a las 7:00. Etiqueta "PREVISIÓN".
+- **Diseño:** podio real (2-1-3) con pilares + tabla; top **30**, sin más municipios.
+  Un color por serie: máximas cálido/rojo, mínimas azul, lluvia verde azulado, viento violeta,
+  nieve gris hielo, avisos rojo suave. Tipografía Inter. Sin medallas.
+- **Formato:** carrusel en el feed (portada con podio + 10 filas por diapositiva) y story 9:16 con
+  las 30 filas (zonas seguras ~250 px arriba y abajo).
+- **Calendario:** 07:00 máximas · 07:05 mínimas · 07:10 lluvia · 07:15 viento · 07:20 nieve ·
+  07:25 avisos · 07:30 mapa o "hoy vs ayer" (domingos: récords de la semana).
+- **Texto de Instagram (copy):** 1) titular con el primer puesto y su dato; 2) los **5 primeros
+  como hashtag de municipio**, sin tildes (#Malaga), con su valor; 3) invitación a deslizar;
+  4) bloque fijo: "📍 Cada mañana, el tiempo de hoy en España para tomártelo con el café. Sigue
+  @hoymeteo y no te pierdas ninguno."; 5) "Fuente: AEMET"; 6) 2–3 hashtags generales.
+- Hashtags de municipio como la gente los escribe (#SantiagoDeCompostela, no #Santiago).
+
+## Hoja de ruta (en este orden)
+
+1. **Validar contra AEMET real.** Clave en `.env` (`AEMET_API_KEY`, nunca en el repositorio).
+   Ejecutar `python run.py --probe Madrid`, comprobar campos reales, corregir
+   `parse_horaria` y los nombres sin resolver en `municipios.csv`. Revisar el límite de
+   peticiones de AEMET y la hora a la que publica la pasada de las 00 UTC.
+2. **Pruebas automáticas** (pytest) del parser, la resolución de nombres y los rankings, con
+   respuestas reales guardadas como fixtures (sin claves).
+3. **Repositorio Git y ejecución diaria sin intervención.** Ejecutar el script a las ~06:30
+   (hora de Madrid) con GitHub Actions o un servidor pequeño. Ojo: el `cron` de GitHub puede
+   retrasarse; y los horarios de verano/invierno cambian el UTC. El script es determinista:
+   **no usar un modelo de IA para ejecutarlo cada día**.
+4. **Serie de avisos (Meteoalerta).** Fuente AEMET `avisos_cap`. Ficha: filas ordenadas de más
+   a menos grave con **zona, motivo (icono + cifra) y color** (rojo/naranja/amarillo, con texto
+   del nivel además del color), resumen con recuento por color. Hashtags de provincia/zona,
+   no de municipio. Sin avisos: post "Hoy no hay avisos meteorológicos". Citar siempre AEMET.
+5. **Serie de nieve.** Ranking por **km esquiables** con **número de pistas abiertas**. No sale
+   de AEMET: sale del parte de cada estación. Investigar fuentes reutilizables. Activar solo en
+   temporada (normalmente desde diciembre).
+6. **Publicación automática.** Instagram Graph API (cuenta profesional vinculada a página de
+   Facebook; carrusel y stories) y TikTok Content Posting API (requiere aprobar la app).
+   Para las URL públicas que exige Instagram, valorar primero opciones gratuitas (GitHub Pages / raw del repo).
+7. **Extras:** mapa de España coloreado, "hoy vs ayer", récords semanales, versión vídeo para
+   TikTok, y web con SEO para monetizar (patrocinios, afiliación).
+
+## Límites y cuidados
+
+- Nada de claves, tokens ni contraseñas en el código, el repositorio ni los registros.
+- AEMET: citar la fuente siempre y **comprobar sus condiciones de reutilización** antes de
+  vender patrocinios. No dar a entender que la cuenta es oficial (nada de "AEMET" en el nombre).
+- Los rankings son entre los municipios de `municipios.csv`; las temperaturas son enteras, así
+  que hay empates (desempate por nombre).
+- Si una serie no tiene datos suficientes ese día, no se publica; no inventar datos.
+- Antes de publicar de verdad en las cuentas, pedir confirmación a Víctor.
+
+## Despliegue y automatización total
+
+- **Dónde corre (decidido por Víctor, 10-nov-2026):** primero alternativas **online y gratuitas**;
+  el NAS (UGREEN DXP2800, admite Docker) queda solo como plan B. Elegido: **GitHub Actions** en
+  repositorio público (minutos ilimitados). `.github/workflows/diario.yml`: cron 03:47 UTC +
+  `wait_until.py 06:15` (hora de Madrid, inmune al cambio de hora y a retrasos del cron),
+  pruebas, generación, artefacto con el material y commit diario de `history/` (evita que GitHub
+  desactive el cron tras 60 días sin actividad). Si falla, GitHub avisa por correo.
+- **Premisa de Víctor:** no quiere hacer nada manual. Minimizar la configuración inicial y
+  agrupar en una sola vez lo que solo pueda hacer él.
+- **Instagram:** la Graph API exige que las imágenes estén en una **URL pública**. Subirlas cada
+  mañana a un almacenamiento externo (p. ej. Cloudflare R2 o S3) y borrarlas después.
+  Renovar automáticamente los tokens de larga duración (caducan a los ~60 días) antes de que expiren.
+- **TikTok:** Content Posting API; mientras la app no esté auditada, las publicaciones salen
+  privadas. Si la aprobación se atasca, valorar un intermediario de pago (Ayrshare, Publer u otro)
+  que publique en ambas redes, comprobando antes precio y condiciones.
+- **Fiabilidad:** reintentos, registro de cada ejecución y aviso a Víctor (correo o Telegram)
+  **solo cuando algo falle o esté a punto de caducar un token**. Nunca pedirle nada a diario.
+- **Salvaguardas:** si los datos son sospechosos (menos municipios de los esperados, valores
+  idénticos a ayer, predicción no elaborada hoy), no publicar y avisar.
+- **Horario:** 07:00 máximas · 07:05 mínimas · 07:10 lluvia · 07:15 viento · 07:20 nieve ·
+  07:25 avisos · 07:30 mapa. El script debe empezar a generar ~06:30 y publicar a su hora exacta.
+
+## Lo que solo puede hacer Víctor (avisar cuando toque)
+
+Poner la clave de AEMET en `.env`; pasar Instagram a cuenta profesional y vincular la página de
+Facebook; autorizar la app de Meta y TikTok; aprobar la primera publicación real.

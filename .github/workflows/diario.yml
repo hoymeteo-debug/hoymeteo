@@ -1,0 +1,72 @@
+# Ejecución diaria de @hoymeteo en GitHub Actions (gratis en repositorios públicos).
+#
+# El cron va en UTC y GitHub puede retrasarlo. Por eso se lanza pronto (03:47 UTC =
+# 04:47 en invierno / 05:47 en verano) y wait_until.py espera hasta las 06:15 de Madrid.
+# Si algo falla, GitHub envía un correo automáticamente al dueño del repositorio.
+name: Publicación diaria
+
+on:
+  schedule:
+    - cron: "47 3 * * *"
+  workflow_dispatch:        # botón "Run workflow" para lanzarlo a mano si hace falta
+
+concurrency:
+  group: diario
+  cancel-in-progress: false
+
+permissions:
+  contents: write           # para guardar history/ en el repositorio
+
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      TZ: Europe/Madrid
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Instalar dependencias
+        run: pip install -r requirements-dev.txt
+
+      - name: Pruebas
+        run: python -m pytest -q
+
+      - name: Catálogo de municipios en caché
+        uses: actions/cache@v4
+        with:
+          path: cache/maestro_municipios.json
+          key: maestro-${{ github.run_id }}
+          restore-keys: maestro-
+
+      - name: Esperar a las 06:15 de Madrid
+        if: github.event_name == 'schedule'
+        run: python wait_until.py 06:15
+
+      - name: Generar imágenes y textos
+        env:
+          AEMET_API_KEY: ${{ secrets.AEMET_API_KEY }}
+        run: python run.py
+
+      - name: Guardar el material del día
+        uses: actions/upload-artifact@v4
+        with:
+          name: hoymeteo-${{ github.run_id }}
+          path: output/
+          retention-days: 14
+
+      # Guardar el histórico sirve para "hoy vs ayer" y además mantiene el repositorio
+      # activo: GitHub desactiva los cron de repos sin actividad durante 60 días.
+      - name: Guardar histórico
+        run: |
+          git config user.name "hoymeteo-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add history/
+          git diff --cached --quiet || git commit -m "Histórico $(date +%F)"
+          git push
