@@ -26,7 +26,7 @@ TIKTOK_AUTOPUBLISH = False
 
 # YouTube: Short diario con todas las series. Client id de Google Cloud (no es secreto; el secreto
 # va en YT_CLIENT_SECRET). Sin auditoría de YouTube, lo subido por la API queda en privado.
-YOUTUBE_CLIENT_ID = ""
+YOUTUBE_CLIENT_ID = "672070220438-iiklrin7g3866no7djls16iqv9c8bttu.apps.googleusercontent.com"
 YOUTUBE_AUTOPUBLISH = False
 YOUTUBE_POST_TIME = "07:06"
 
