@@ -142,6 +142,12 @@ class Instagram:
         self.wait_ready(parent)
         return parent
 
+    def prepare_image(self, image_url, caption):
+        """Publicación de una sola imagen (p. ej. «Hoy no hay avisos»)."""
+        cid = self._container(image_url=image_url, caption=caption)
+        self.wait_ready(cid)
+        return cid
+
     def prepare_story(self, image_url):
         cid = self._container(image_url=image_url, media_type="STORIES")
         self.wait_ready(cid)

@@ -111,6 +111,30 @@ def draw_icon(cv, kind, cx, cy, r, circle_color, fg="#FFFFFF"):
         cv.line([(x0, cy + 3 * k), (cx + 26 * k, cy + 3 * k)], fg, 6 * k)
         cv.line([(x0, cy + 21 * k), (cx + 6 * k, cy + 21 * k)], fg, 6 * k)
         cv.arc(cx + 6 * k, cy + 30 * k, 9 * k, 270, 180, fg, 6 * k)
+    elif kind == "bolt":
+        pts = [(4, -30), (-16, 4), (-2, 4), (-6, 30), (16, -6), (2, -6), (8, -30)]
+        cv.d.polygon([((cx + x * k) * S, (cy + y * k) * S) for x, y in pts], fill=rgb(fg))
+    elif kind == "snow":
+        for ang in (0, 60, 120):
+            a = math.radians(ang)
+            dx, dy = 26 * k * math.cos(a), 26 * k * math.sin(a)
+            cv.line([(cx - dx, cy - dy), (cx + dx, cy + dy)], fg, 5 * k)
+    elif kind == "wave":
+        for dy in (-12, 10):
+            for i in range(3):
+                x = cx - 24 * k + i * 16 * k
+                cv.arc(x + 8 * k, cy + dy * k, 8 * k, 180, 360, fg, 5 * k)
+    elif kind == "fog":
+        for i, dy in enumerate((-16, 0, 16)):
+            off = 6 * k if i == 1 else 0
+            cv.line([(cx - 26 * k + off, cy + dy * k), (cx + 26 * k - off, cy + dy * k)], fg, 6 * k)
+    elif kind == "check":
+        cv.line([(cx - 20 * k, cy + 2 * k), (cx - 6 * k, cy + 16 * k), (cx + 22 * k, cy - 14 * k)], fg, 8 * k)
+    elif kind == "alert":
+        pts = [(0, -30), (30, 24), (-30, 24)]
+        cv.d.polygon([((cx + x * k) * S, (cy + y * k) * S) for x, y in pts], fill=rgb(fg))
+        cv.rect(cx - 3.5 * k, cy - 12 * k, cx + 3.5 * k, cy + 8 * k, circle_color, r=3 * k)
+        cv.circle(cx, cy + 15 * k, 4 * k, circle_color)
 
 
 # --- Bloques de diseño -----------------------------------------------------------------
@@ -119,7 +143,8 @@ def draw_header(cv, cfg, x, y_center, date_label, scale=1.0, right_text=None, ri
     r = 46 * scale
     draw_icon(cv, cfg["icon"], x + r, y_center, r, c["accent"])
     tx = x + 2 * r + 24 * scale
-    cv.text(tx, y_center - 28 * scale, f"PREVISIÓN · {date_label}", 24 * scale, c["label"], bold=True)
+    eyebrow = cfg.get("eyebrow", "PREVISIÓN")
+    cv.text(tx, y_center - 28 * scale, f"{eyebrow} · {date_label}", 24 * scale, c["label"], bold=True)
     cv.text(tx, y_center + 14 * scale, cfg["title"], 50 * scale, c["text"], bold=True)
     if right_text:
         cv.text(right_x, y_center - 28 * scale, right_text, 24 * scale, c["label"], bold=True, anchor="rm")
@@ -231,6 +256,119 @@ def render_story(cfg, ranking, date_label, out_path):
     row_h, rgap, y0 = 56, 6, 790
     draw_rows(cv, cfg, rows[:left], 4, total, M, M + colw, y0, row_h, rgap, 27, 28)
     draw_rows(cv, cfg, rows[left:], 4 + left, total, M + colw + gap, W - M, y0, row_h, rgap, 27, 28)
+    footer(cv, cfg, 1700, size=28)
+    cv.save(out_path)
+    return out_path
+
+
+# --- Serie de avisos ---------------------------------------------------------------------
+LEVEL_STYLE = {  # nivel -> (fondo, texto, nombre)
+    3: ("#C62828", "#FFFFFF", "ROJO"),
+    2: ("#EF6C00", "#FFFFFF", "NARANJA"),
+    1: ("#F9C80E", "#3D2E00", "AMARILLO"),
+}
+
+
+def draw_level_tiles(cv, cfg, n_by_level, x0, x1, y0, h, num_size=72, label_size=24):
+    """Resumen: una tarjeta por color con el número de avisos y su nombre."""
+    gap = 20
+    w = (x1 - x0 - 2 * gap) / 3
+    labels = {3: ("rojo", "rojos"), 2: ("naranja", "naranjas"), 1: ("amarillo", "amarillos")}
+    for i, lvl in enumerate((3, 2, 1)):
+        bg, fg, _ = LEVEL_STYLE[lvl]
+        n = n_by_level.get(lvl, 0)
+        x = x0 + i * (w + gap)
+        if n == 0:  # sin avisos de ese color: tarjeta apagada
+            bg, fg = mix(cfg["colors"]["bg"], "#FFFFFF", 0.5), cfg["colors"]["label"]
+        cv.rect(x, y0, x + w, y0 + h, bg, r=18)
+        cv.text(x + w / 2, y0 + h * 0.42, str(n), num_size, fg, bold=True, anchor="mm")
+        cv.text(x + w / 2, y0 + h * 0.80, labels[lvl][0 if n == 1 else 1].upper(), label_size, fg, bold=True, anchor="mm")
+
+
+def draw_aviso_rows(cv, cfg, rows, x0, x1, y0, row_h, gap, name_size, sub_size, chip_w=150):
+    c = cfg["colors"]
+    row_bg = mix(c["bg"], "#FFFFFF", 0.6)
+    for i, a in enumerate(rows):
+        y = y0 + i * (row_h + gap)
+        bg, fg, name = LEVEL_STYLE[a["level"]]
+        cv.rect(x0, y, x1, y + row_h, row_bg, r=12)
+        cv.rect(x0, y, x0 + chip_w, y + row_h, bg, r=12, corners=(True, False, False, True))
+        cy = y + row_h / 2
+        cv.text(x0 + chip_w / 2, cy, name, sub_size * 0.92, fg, bold=True, anchor="mm")
+        ir = row_h * 0.3
+        icx = x0 + chip_w + 18 + ir
+        draw_icon(cv, a["icon"], icx, cy, ir, c["text"])
+        tx = icx + ir + 18
+        maxw = x1 - tx - 16
+        cv.text(tx, cy - row_h * 0.19, cv.fit(a["zone_name"], name_size, maxw, bold=True), name_size, c["text"], bold=True)
+        sub = f"{a['region']} · {a['motivo']}"
+        cv.text(tx, cy + row_h * 0.22, cv.fit(sub, sub_size, maxw), sub_size, c["label"])
+
+
+def _no_avisos(cv, cfg, cy, size):
+    draw_icon(cv, "check", cv.w / 2, cy, size, "#2E7D32")
+    cv.text(cv.w / 2, cy + size + 80, "Hoy no hay avisos", 64, cfg["colors"]["text"], bold=True, anchor="mm")
+    cv.text(cv.w / 2, cy + size + 150, "meteorológicos en España", 40, cfg["colors"]["label"], anchor="mm")
+
+
+def render_avisos_carousel(cfg, avisos, n_by_level, date_label, out_dir, max_slides=10):
+    W, H, M = 1080, 1350, 64
+    out_dir = Path(out_dir)
+    if not avisos:
+        cv = Canvas(W, H, cfg["colors"]["bg"])
+        draw_header(cv, cfg, M, 120, date_label)
+        _no_avisos(cv, cfg, 560, 120)
+        footer(cv, cfg, H - 44)
+        p = out_dir / "slide_1.png"
+        cv.save(p)
+        return [p]
+
+    first, per = 8, 10
+    rest = avisos[first:]
+    # Reparto equilibrado (p. ej. 42 filas -> 9+9+8+8+8) para no dejar una última diapositiva casi vacía
+    n_chunks = min(math.ceil(len(rest) / per), max_slides - 1) if rest else 0
+    size = math.ceil(len(rest) / n_chunks) if n_chunks else per
+    size = min(max(size, 1), per)
+    chunks = [rest[i:i + size] for i in range(0, len(rest), size)][:n_chunks]
+    shown = first + sum(len(ch) for ch in chunks)
+    hidden = len(avisos) - shown
+    n_slides = 1 + len(chunks)
+    paths = []
+
+    cv = Canvas(W, H, cfg["colors"]["bg"])
+    draw_header(cv, cfg, M, 120, date_label, right_text=f"1/{n_slides}" if n_slides > 1 else None, right_x=W - M)
+    draw_level_tiles(cv, cfg, n_by_level, M, W - M, 220, 170)
+    draw_aviso_rows(cv, cfg, avisos[:first], M, W - M, 420, 92, 10, 32, 24)
+    footer(cv, cfg, H - 44)
+    p = out_dir / "slide_1.png"
+    cv.save(p)
+    paths.append(p)
+
+    for n, chunk in enumerate(chunks, start=2):
+        cv = Canvas(W, H, cfg["colors"]["bg"])
+        draw_header(cv, cfg, M, 120, date_label, right_text=f"{n}/{n_slides}", right_x=W - M)
+        draw_aviso_rows(cv, cfg, chunk, M, W - M, 230, 92, 10, 32, 24)
+        if n == n_slides and hidden > 0:
+            cv.text(W / 2, H - 100, f"y {hidden} avisos más en aemet.es", 30, cfg["colors"]["label"], bold=True, anchor="mm")
+        footer(cv, cfg, H - 44)
+        p = out_dir / f"slide_{n}.png"
+        cv.save(p)
+        paths.append(p)
+    return paths
+
+
+def render_avisos_story(cfg, avisos, n_by_level, date_label, out_path):
+    W, H, M = 1080, 1920, 50
+    cv = Canvas(W, H, cfg["colors"]["bg"])
+    draw_header(cv, cfg, M, 300, date_label)
+    if not avisos:
+        _no_avisos(cv, cfg, 820, 140)
+    else:
+        draw_level_tiles(cv, cfg, n_by_level, M, W - M, 400, 150, num_size=64)
+        max_rows = 12
+        draw_aviso_rows(cv, cfg, avisos[:max_rows], M, W - M, 580, 74, 8, 28, 21, chip_w=136)
+        if len(avisos) > max_rows:
+            cv.text(W / 2, 1615, f"y {len(avisos) - max_rows} avisos más", 30, cfg["colors"]["label"], bold=True, anchor="mm")
     footer(cv, cfg, 1700, size=28)
     cv.save(out_path)
     return out_path

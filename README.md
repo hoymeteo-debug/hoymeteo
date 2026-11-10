@@ -1,7 +1,7 @@
 # @hoymeteo · generador de publicaciones diarias
 
-Genera cada mañana, con la previsión de AEMET, las publicaciones de cuatro series:
-**calor, frío, lluvia y viento**. Para cada serie crea:
+Genera cada mañana, con la previsión de AEMET, las publicaciones de cinco series:
+**calor, frío, lluvia, viento y avisos** (Meteoalerta). Para cada serie crea:
 
 - Un **carrusel** 1080×1350 (portada con podio + puestos 4–10, y 2 diapositivas más hasta el top 30).
 - Una **story** 1080×1920 con el top 30 completo (respeta las zonas seguras de Instagram).

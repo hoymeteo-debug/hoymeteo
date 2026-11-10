@@ -109,10 +109,11 @@ def cmd_run(mode: str, target: date):
     prepared, failures = [], []
     for key, cfg, slides, story, caption in material:
         try:
-            carousel = ig.prepare_carousel([public_url(base, target, key, s) for s in slides], caption)
+            urls = [public_url(base, target, key, s) for s in slides]
+            carousel = ig.prepare_carousel(urls, caption) if len(urls) > 1 else ig.prepare_image(urls[0], caption)
             story_id = ig.prepare_story(public_url(base, target, key, story)) if story else None
             prepared.append((key, cfg, carousel, story_id))
-            print(f"- {cfg['label']}: carrusel de {len(slides)} listo" + (" + story lista" if story_id else ""))
+            print(f"- {cfg['label']}: " + (f"carrusel de {len(slides)}" if len(slides) > 1 else "imagen") + " lista" + (" + story lista" if story_id else ""))
         except InstagramError as exc:
             failures.append(f"{cfg['label']}: {exc}")
             print(f"- ERROR {cfg['label']}: {exc}")
@@ -132,6 +133,11 @@ def cmd_run(mode: str, target: date):
     else:
         print("Modo prueba: no se ha publicado nada (los contenedores caducan solos en 24 h).")
 
+    # Errores de generación (p. ej. avisos que no se pudieron descargar): se publica el resto
+    # y la ejecución termina con error para que GitHub avise por correo.
+    gen_errors = config.OUTPUT_DIR / target.isoformat() / "ERRORES.txt"
+    if gen_errors.exists():
+        failures += [f"generación: {l}" for l in gen_errors.read_text(encoding="utf-8").splitlines() if l]
     if failures:
         sys.exit("Fallos:\n  " + "\n  ".join(failures))
 

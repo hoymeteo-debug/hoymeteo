@@ -133,4 +133,19 @@ SERIES = {
             "pillar_text": ["#FFFFFF", "#FFFFFF", "#26215C"],
         },
     },
+    # Serie de avisos (Meteoalerta): no es un ranking; la genera avisos.py
+    "avisos": {
+        "kind": "avisos",
+        "label": "Avisos",
+        "title": "Avisos para hoy",
+        "eyebrow": "AVISOS",
+        "icon": "alert",
+        "post_time": "07:25",
+        "colors": {
+            "bg": "#FCEEEC", "text": "#4A1714", "accent": "#B3261E", "label": "#9A3B33",
+        },
+    },
 }
+
+# Series de ranking (todas menos los avisos)
+RANKING_SERIES = [k for k, v in SERIES.items() if v.get("kind") != "avisos"]

@@ -91,6 +91,32 @@ def check_and_save(records, municipios, target):
         json.dumps(today, ensure_ascii=False, indent=1, sort_keys=True), encoding="utf-8")
 
 
+def clean_dir(out):
+    """Borra imágenes de una ejecución anterior para no mezclar diapositivas."""
+    for old in Path(out).glob("*.png"):
+        old.unlink()
+
+
+def generate_avisos(target, date_label, out, demo=False, refresh=False):
+    """Serie de avisos de AEMET (Meteoalerta). Devuelve 1 si se ha generado."""
+    import avisos as av
+    from aemet_client import AemetClient
+    cfg = config.SERIES["avisos"]
+    if demo:
+        raw = (config.BASE / "tests" / "fixtures" / "avisos_muestra.tar").read_bytes()
+    else:
+        raw = av.fetch_tar(AemetClient(os.environ.get("AEMET_API_KEY", "")), target, use_cache=not refresh)
+    lista = av.avisos_de_hoy(av.read_tar(raw), target)
+    n = av.counts(lista)
+    clean_dir(out)
+    slides = render.render_avisos_carousel(cfg, lista, n, date_label, out)
+    render.render_avisos_story(cfg, lista, n, date_label, out / "story.png")
+    (out / "caption.txt").write_text(av.build_caption(lista, captions.fecha_larga(target)), encoding="utf-8")
+    resumen = f"{len(lista)} avisos (rojos {n[3]}, naranjas {n[2]}, amarillos {n[1]})" if lista else "sin avisos"
+    print(f"- {cfg['label']} ({cfg['post_time']}): {resumen} · {len(slides)} diapositivas + story + texto -> {out}")
+    return 1
+
+
 def main():
     load_env()
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -110,34 +136,51 @@ def main():
     if unknown:
         sys.exit(f"Series desconocidas: {unknown}")
 
-    municipios = ds.load_municipios()
-    print(f"Fecha: {target} · {len(municipios)} municipios en la lista · {'DEMO' if args.demo else 'AEMET'}")
-    if args.demo:
-        records = ds.demo_records(municipios, target)
-    else:
-        key = os.environ.get("AEMET_API_KEY", "")
-        if not key:
-            sys.exit("Falta AEMET_API_KEY. Copia .env.example a .env y pon tu clave (o usa --demo).")
-        records = ds.fetch_records(key, municipios, target, use_cache=not args.refresh)
-    print(f"Datos válidos: {len(records)} municipios")
-    if not args.demo:
-        check_and_save(records, municipios, target)
-
     out_root = config.OUTPUT_DIR / target.isoformat()
     date_label = captions.fecha_corta(target)
     made = 0
-    for key in keys:
-        cfg = config.SERIES[key]
-        ranking = ds.build_ranking(records, cfg)
-        if len(ranking) < cfg["min_items"]:
-            print(f"- {cfg['label']}: solo {len(ranking)} municipios con datos, no se publica hoy")
-            continue
-        out = out_root / key
-        slides = render.render_carousel(cfg, ranking, date_label, out)
-        story = render.render_story(cfg, ranking, date_label, out / "story.png")
-        (out / "caption.txt").write_text(captions.build_caption(cfg, ranking, target), encoding="utf-8")
-        print(f"- {cfg['label']} ({cfg['post_time']}): {len(slides)} diapositivas + story + texto -> {out}")
-        made += 1
+    ranking_keys = [k for k in keys if k in config.RANKING_SERIES]
+
+    if ranking_keys:
+        municipios = ds.load_municipios()
+        print(f"Fecha: {target} · {len(municipios)} municipios en la lista · {'DEMO' if args.demo else 'AEMET'}")
+        if args.demo:
+            records = ds.demo_records(municipios, target)
+        else:
+            key = os.environ.get("AEMET_API_KEY", "")
+            if not key:
+                sys.exit("Falta AEMET_API_KEY. Copia .env.example a .env y pon tu clave (o usa --demo).")
+            records = ds.fetch_records(key, municipios, target, use_cache=not args.refresh)
+        print(f"Datos válidos: {len(records)} municipios")
+        if not args.demo:
+            check_and_save(records, municipios, target)
+
+        for key in ranking_keys:
+            cfg = config.SERIES[key]
+            ranking = ds.build_ranking(records, cfg)
+            if len(ranking) < cfg["min_items"]:
+                print(f"- {cfg['label']}: solo {len(ranking)} municipios con datos, no se publica hoy")
+                continue
+            out = out_root / key
+            clean_dir(out)
+            slides = render.render_carousel(cfg, ranking, date_label, out)
+            render.render_story(cfg, ranking, date_label, out / "story.png")
+            (out / "caption.txt").write_text(captions.build_caption(cfg, ranking, target), encoding="utf-8")
+            print(f"- {cfg['label']} ({cfg['post_time']}): {len(slides)} diapositivas + story + texto -> {out}")
+            made += 1
+
+    if "avisos" in keys:
+        # Un fallo en los avisos no debe impedir publicar el resto: se anota y publish.py
+        # termina con error al final (GitHub avisa por correo).
+        try:
+            made += generate_avisos(target, date_label, out_root / "avisos", demo=args.demo, refresh=args.refresh)
+        except Exception as exc:  # noqa: BLE001
+            msg = f"Avisos: {type(exc).__name__}: {exc}"
+            print(f"- ERROR {msg} -> no se publican los avisos hoy")
+            out_root.mkdir(parents=True, exist_ok=True)
+            with open(out_root / "ERRORES.txt", "a", encoding="utf-8") as f:
+                f.write(msg + "\n")
+
     print(f"Listo: {made} series generadas en {out_root}")
 
 

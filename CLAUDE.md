@@ -33,6 +33,14 @@ antiguas desaparecen) y se sirven por raw.githubusercontent.com. `INSTAGRAM_AUTO
 la ejecución diaria publica carrusel + story de cada serie a su hora. A mano: botón
 "Run workflow" con modo nada / comprobar / preparar / publicar.
 
+**Serie de avisos hecha (10-nov-2026):** `avisos.py` descarga `avisos_cap/ultimoelaborado/area/esp`
+(tar de XML CAP), descarta verdes y cancelaciones, filtra los vigentes hoy en hora de Madrid y agrupa
+por zona + fenómeno (nivel más alto y solo las cifras de ese nivel). Provincia = dígitos 3-4 del código
+de zona, salvo Baleares/Canarias (isla). Render en `render.py` (`render_avisos_*`): portada con recuento
+por color + 8 filas, resto equilibrado hasta 10 diapositivas; story con 12 filas; sin avisos, imagen
+única «Hoy no hay avisos». Publica a las 07:25. Si falla la descarga NO se publica «no hay avisos»: se
+anota en `output/<fecha>/ERRORES.txt`, se publica el resto y la ejecución acaba en error (correo).
+
 **TikTok preparado (10-nov-2026), pendiente de Víctor:** `tiktok.py` + `tiktok_cli.py`, web en
 `docs/` (privacidad, condiciones, página de retorno `/tiktok/` que muestra el código), workflows
 `web.yml` (Pages por Actions, incluye la rama `media` en `/media/`), `tiktok-conectar.yml` y
