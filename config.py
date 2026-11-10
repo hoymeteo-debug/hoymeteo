@@ -160,10 +160,11 @@ SERIES = {
         "ranking_line": "Diferencia entre la mínima y la máxima previstas para hoy, {fecha}:",
         "hashtags": "#ElTiempo #Temperaturas #AEMET",
         "colors": {
-            "bg": "#EEF2F5", "text": "#1C2A35", "accent": "#3F5F78", "label": "#4E6A80",
-            "strip_from": "#2B4559", "strip_to": "#A9BFCF",
-            "pillars": ["#3F5F78", "#6B8AA3", "#A9BFCF"],
-            "pillar_text": ["#FFFFFF", "#FFFFFF", "#1C2A35"],
+            # Fucsia: entre el rojo de avisos y el violeta del viento en la cuadrícula del feed
+            "bg": "#F9E6F1", "text": "#45102F", "accent": "#A3306F", "label": "#94376A",
+            "strip_from": "#7A1F52", "strip_to": "#E7A3C8",
+            "pillars": ["#A3306F", "#C95A93", "#E7A3C8"],
+            "pillar_text": ["#FFFFFF", "#FFFFFF", "#45102F"],
         },
     },
     # Serie de avisos (Meteoalerta): no es un ranking; la genera avisos.py
