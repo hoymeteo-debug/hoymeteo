@@ -74,8 +74,8 @@
  "Arrecife": {
   "gust_kmh": 34.0,
   "rain_mm": 0.0,
-  "tmax": 24.0,
-  "tmin": 21.0
+  "tmax": 26.0,
+  "tmin": 19.0
  },
  "Astorga": {
   "gust_kmh": 38.0,
@@ -308,8 +308,8 @@
  "La Gomera": {
   "gust_kmh": 47.0,
   "rain_mm": 0.2,
-  "tmax": 24.0,
-  "tmin": 19.0
+  "tmax": 27.0,
+  "tmin": 22.0
  },
  "La Laguna": {
   "gust_kmh": 46.0,
@@ -320,8 +320,8 @@
  "Las Palmas": {
   "gust_kmh": 36.0,
   "rain_mm": 0.0,
-  "tmax": 26.0,
-  "tmin": 20.0
+  "tmax": 25.0,
+  "tmin": 21.0
  },
  "León": {
   "gust_kmh": 30.0,
@@ -518,8 +518,8 @@
  "Puerto del Rosario": {
   "gust_kmh": 38.0,
   "rain_mm": 0.0,
-  "tmax": 27.0,
-  "tmin": 19.0
+  "tmax": 26.0,
+  "tmin": 21.0
  },
  "Reinosa": {
   "gust_kmh": 53.0,
@@ -572,14 +572,14 @@
  "Santa Cruz de La Palma": {
   "gust_kmh": 54.0,
   "rain_mm": 0.8,
-  "tmax": 23.0,
-  "tmin": 17.0
+  "tmax": 26.0,
+  "tmin": 18.0
  },
  "Santa Cruz de Tenerife": {
   "gust_kmh": 53.0,
   "rain_mm": 0.0,
-  "tmax": 24.0,
-  "tmin": 19.0
+  "tmax": 26.0,
+  "tmin": 21.0
  },
  "Santander": {
   "gust_kmh": 44.0,
@@ -680,8 +680,8 @@
  "Valverde": {
   "gust_kmh": 79.0,
   "rain_mm": 0.7,
-  "tmax": 21.0,
-  "tmin": 15.0
+  "tmax": 22.0,
+  "tmin": 17.0
  },
  "Vielha": {
   "gust_kmh": 28.0,
