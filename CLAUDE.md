@@ -39,10 +39,10 @@ la ejecución diaria publica carrusel + story de cada serie a su hora. A mano: b
 por zona + fenómeno (nivel más alto y solo las cifras de ese nivel). Provincia = dígitos 3-4 del código
 de zona, salvo Baleares/Canarias (isla). Render en `render.py` (`render_avisos_*`): portada con recuento
 por color + 8 filas, resto equilibrado hasta 10 diapositivas; story con 12 filas; sin avisos, imagen
-única «Hoy no hay avisos». Publica a las 07:25. Si falla la descarga NO se publica «no hay avisos»: se
+única «Hoy no hay avisos». Publica a las 07:05. Si falla la descarga NO se publica «no hay avisos»: se
 anota en `output/<fecha>/ERRORES.txt`, se publica el resto y la ejecución acaba en error (correo).
 
-**Serie de contraste (10-nov-2026, elegida por Víctor):** ocupa el hueco de las 07:20 mientras no haya
+**Serie de contraste (10-nov-2026, elegida por Víctor):** ocupa el hueco de la nieve (07:04) mientras no haya
 temporada de esquí. «Hoy habrá más contraste en» = máxima − mínima oficiales (diaria). Cada fila lleva
 la hora de ambas, de la horaria («↓14° a las 7 h · ↑28° a las 15 h»; si se mantiene varias horas, la
 del medio). Las horas solo se muestran si la horaria trae el día completo (24 h); si no, «↓14° · ↑28°».
@@ -86,8 +86,9 @@ parser), `data_sources.py` (datos reales/demo y rankings), `render.py` (Pillow),
   nieve gris hielo, avisos rojo suave. Tipografía Inter. Sin medallas.
 - **Formato:** carrusel en el feed (portada con podio + 10 filas por diapositiva) y story 9:16 con
   las 30 filas (zonas seguras ~250 px arriba y abajo).
-- **Calendario:** 07:00 máximas · 07:05 mínimas · 07:10 lluvia · 07:15 viento · 07:20 nieve ·
-  07:25 avisos · 07:30 mapa o "hoy vs ayer" (domingos: récords de la semana).
+- **Calendario (cambiado por Víctor el 10-nov-2026):** todo seguido, una serie por minuto: 07:00 máximas ·
+  07:01 mínimas · 07:02 lluvia · 07:03 viento · 07:04 contraste (nieve/esquí en temporada) · 07:05 avisos.
+  Futuras series (mapa, "hoy vs ayer", récords del domingo) a continuación, minuto a minuto.
 - **Texto de Instagram (copy):** 1) titular con el primer puesto y su dato; 2) los **5 primeros
   como hashtag de municipio**, sin tildes (#Malaga), con su valor; 3) invitación a deslizar;
   4) bloque fijo: "📍 Cada mañana, el tiempo de hoy en España para tomártelo con el café. Sigue
@@ -149,8 +150,8 @@ parser), `data_sources.py` (datos reales/demo y rankings), `render.py` (Pillow),
   **solo cuando algo falle o esté a punto de caducar un token**. Nunca pedirle nada a diario.
 - **Salvaguardas:** si los datos son sospechosos (menos municipios de los esperados, valores
   idénticos a ayer, predicción no elaborada hoy), no publicar y avisar.
-- **Horario:** 07:00 máximas · 07:05 mínimas · 07:10 lluvia · 07:15 viento · 07:20 nieve ·
-  07:25 avisos · 07:30 mapa. El script debe empezar a generar ~06:30 y publicar a su hora exacta.
+- **Horario:** 07:00 a 07:05, una serie por minuto (ver Calendario). El script empieza a generar a las 06:15 y
+  publica a su hora exacta.
 
 ## Lo que solo puede hacer Víctor (avisar cuando toque)
 

@@ -63,7 +63,7 @@ def _contrast_detail(r, short=False):
     return f"↓{lo} a las {r['tmin_h']} h · ↑{hi} a las {r['tmax_h']} h"
 
 
-# Orden = orden de publicación (07:00 a 07:15)
+# Orden = orden de publicación: una serie por minuto, de 07:00 a 07:05 (decidido por Víctor, 10-nov-2026)
 SERIES = {
     "max": {
         "label": "Máximas",
@@ -88,7 +88,7 @@ SERIES = {
         "label": "Mínimas",
         "title": "Hoy hará más frío en",
         "icon": "thermometer_minus",
-        "post_time": "07:05",
+        "post_time": "07:01",
         "field": "tmin",
         "ascending": True,
         "min_items": 3,
@@ -107,7 +107,7 @@ SERIES = {
         "label": "Lluvia",
         "title": "Hoy lloverá más en",
         "icon": "drop",
-        "post_time": "07:10",
+        "post_time": "07:02",
         "field": "rain_mm",
         "ascending": False,
         "min_value": 0.1,   # por debajo se considera "sin lluvia"
@@ -127,7 +127,7 @@ SERIES = {
         "label": "Viento",
         "title": "Hoy hará más viento en",
         "icon": "wind",
-        "post_time": "07:15",
+        "post_time": "07:03",
         "field": "gust_kmh",
         "ascending": False,
         "min_value": 1,
@@ -149,7 +149,7 @@ SERIES = {
         "title": "Hoy habrá más contraste en",
         "subtitle": "Diferencia entre la mínima y la máxima de hoy",
         "icon": "contrast",
-        "post_time": "07:20",
+        "post_time": "07:04",
         "field": "amp_c",
         "ascending": False,
         "min_items": 3,
@@ -174,7 +174,7 @@ SERIES = {
         "title": "Avisos para hoy",
         "eyebrow": "AVISOS",
         "icon": "alert",
-        "post_time": "07:25",
+        "post_time": "07:05",
         "colors": {
             "bg": "#FCEEEC", "text": "#4A1714", "accent": "#B3261E", "label": "#9A3B33",
         },
