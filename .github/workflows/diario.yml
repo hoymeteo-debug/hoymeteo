@@ -8,21 +8,28 @@ name: Publicación diaria
 on:
   schedule:
     - cron: "47 3 * * *"
-  workflow_dispatch:        # botón "Run workflow" para lanzarlo a mano si hace falta
+  workflow_dispatch:        # botón "Run workflow" para lanzarlo a mano
+    inputs:
+      instagram:
+        description: "Qué hacer en Instagram"
+        type: choice
+        default: comprobar
+        options: [nada, comprobar, preparar, publicar]
 
 concurrency:
   group: diario
   cancel-in-progress: false
 
 permissions:
-  contents: write           # para guardar history/ en el repositorio
+  contents: write           # history/ en main y las imágenes en la rama "media"
 
 jobs:
   generar:
     runs-on: ubuntu-latest
-    timeout-minutes: 150
+    timeout-minutes: 180
     env:
       TZ: Europe/Madrid
+      MEDIA_BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/media
     steps:
       - uses: actions/checkout@v4
 
@@ -38,6 +45,24 @@ jobs:
       - name: Pruebas
         run: python -m pytest -q
 
+      - name: Qué hacer hoy en Instagram
+        id: modo
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            modo=$(python -c "import config; print('publicar' if config.INSTAGRAM_AUTOPUBLISH else 'preparar')")
+          else
+            modo="${{ inputs.instagram }}"
+          fi
+          echo "instagram=$modo" >> "$GITHUB_OUTPUT"
+          echo "Instagram: $modo"
+
+      - name: Comprobar la cuenta de Instagram
+        if: steps.modo.outputs.instagram != 'nada'
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: python publish.py check
+
       - name: Catálogo de municipios en caché
         uses: actions/cache@v4
         with:
@@ -50,11 +75,13 @@ jobs:
         run: python wait_until.py 06:15
 
       - name: Generar imágenes y textos
+        if: steps.modo.outputs.instagram != 'comprobar'
         env:
           AEMET_API_KEY: ${{ secrets.AEMET_API_KEY }}
         run: python run.py
 
       - name: Guardar el material del día
+        if: steps.modo.outputs.instagram != 'comprobar'
         uses: actions/upload-artifact@v4
         with:
           name: hoymeteo-${{ github.run_id }}
@@ -64,9 +91,44 @@ jobs:
       # Guardar el histórico sirve para "hoy vs ayer" y además mantiene el repositorio
       # activo: GitHub desactiva los cron de repos sin actividad durante 60 días.
       - name: Guardar histórico
+        if: steps.modo.outputs.instagram != 'comprobar'
         run: |
           git config user.name "hoymeteo-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add history/
           git diff --cached --quiet || git commit -m "Histórico $(date +%F)"
           git push
+
+      # Instagram descarga las imágenes desde una URL pública. Se suben a la rama "media",
+      # que se reescribe cada día solo con las de hoy (las anteriores desaparecen).
+      - name: Subir las imágenes del día (JPEG)
+        if: steps.modo.outputs.instagram == 'preparar' || steps.modo.outputs.instagram == 'publicar'
+        run: |
+          python publish.py jpeg
+          cd media
+          git init -q -b media
+          git config user.name "hoymeteo-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -qm "Imágenes $(date +%F)"
+          git push -fq "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" media
+          first=$(find . -name 'slide_1.jpg' | head -1 | sed 's|^\./||')
+          for i in 1 2 3 4 5 6; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$MEDIA_BASE_URL/$first")
+            [ "$code" = 200 ] && break
+            sleep 10
+          done
+          echo "Imagen pública: $MEDIA_BASE_URL/$first -> HTTP $code"
+          [ "$code" = 200 ]
+
+      - name: Instagram (${{ steps.modo.outputs.instagram }})
+        if: steps.modo.outputs.instagram == 'preparar' || steps.modo.outputs.instagram == 'publicar'
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: |
+          if [ "${{ steps.modo.outputs.instagram }}" = "publicar" ]; then
+            python publish.py run --mode publish
+          else
+            python publish.py run --mode prepare
+          fi

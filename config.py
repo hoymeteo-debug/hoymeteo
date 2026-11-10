@@ -9,6 +9,11 @@ MUNICIPIOS_CSV = BASE / "municipios.csv"
 HISTORY_DIR = BASE / "history"  # un JSON por día; se guarda en el repositorio
 MIN_COVERAGE = 0.9  # si faltan más del 10 % de municipios, no se publica
 
+# Publicación automática en Instagram cada mañana. Mientras sea False, la ejecución diaria
+# solo PREPARA las publicaciones (comprueba que todo funciona) pero no publica nada.
+# Se activa cuando Víctor apruebe la primera publicación real.
+INSTAGRAM_AUTOPUBLISH = False
+
 HANDLE = "@hoymeteo"
 TIMEZONE = "Europe/Madrid"
 TOP_N = 30  # puestos del ranking
