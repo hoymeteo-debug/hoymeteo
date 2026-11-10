@@ -19,7 +19,7 @@ series (`max`, `min`, `rain`, `wind`): carrusel 1080×1350 (podio + top 30), sto
 `precipitacion`, `vientoAndRachaMax` con `value` = racha). Máx/mín se toman de la previsión
 **diaria** (`temperatura.maxima/minima`), porque la horaria del primer día empieza en la hora de
 elaboración y además da valores más bajos que la oficial (Madrid: 16° horaria vs 18° diaria).
-Lluvia y rachas, de la horaria. Los 112 municipios de `municipios.csv` se resuelven. Una
+Lluvia y rachas, de la horaria. Los 122 municipios de `municipios.csv` se resuelven (10 pueblos fríos de montaña añadidos el 10-nov para que las mínimas de invierno tengan más contraste). Una
 ejecución completa son 448 llamadas (~16 min reales; empezar a las 06:15 como tarde). Pruebas: `python -m pytest` (fixtures reales en
 `tests/fixtures/`). Medido el 10-nov-2026: entre 06:16 y 07:00 (Madrid) AEMET seguía sirviendo la predicción elaborada
 la víspera a las 20:59; la de madrugada no llega antes de las 07:00. Se usa esa, es la última disponible
