@@ -44,6 +44,9 @@ def export_jpeg(target: date):
     import shutil
     for mp4 in src_root.glob("*/story.mp4"):  # stories en vídeo
         shutil.copyfile(mp4, MEDIA_DIR / target.isoformat() / mp4.parent.name / "story.mp4")
+    if (src_root / "short.mp4").exists():  # Short diario de YouTube
+        (MEDIA_DIR / target.isoformat()).mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(src_root / "short.mp4", MEDIA_DIR / target.isoformat() / "short.mp4")
     for caption in src_root.glob("*/caption.txt"):  # TikTok lo lee desde aquí
         (MEDIA_DIR / target.isoformat() / caption.parent.name / "caption.txt").write_text(
             caption.read_text(encoding="utf-8"), encoding="utf-8")

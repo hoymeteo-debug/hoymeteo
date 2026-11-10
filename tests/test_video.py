@@ -38,3 +38,17 @@ def test_video_de_story(tmp_path):
     out = video.render_story_video(png, tmp_path / "story.mp4", video.pick_track(date(2026, 11, 10), "max"), duration=2)
     probe = subprocess.run([video.ffmpeg_exe(), "-i", str(out)], capture_output=True, text=True).stderr
     assert "h264" in probe and "aac" in probe and "1080x1920" in probe
+
+
+def test_short_diario(tmp_path):
+    recs = ds.demo_records(ds.load_municipios(), date(2026, 11, 10))
+    pngs = []
+    for k in ("max", "min"):
+        cfg = config.SERIES[k]
+        pngs.append(render.render_story(cfg, ds.build_ranking(recs, cfg), "MAR 10 NOV", tmp_path / k / "story.png"))
+    out = video.render_daily_short(pngs, tmp_path / "short.mp4", "Martes 10 de noviembre",
+                                   video.pick_track(date(2026, 11, 10), "max", long=True))
+    probe = subprocess.run([video.ffmpeg_exe(), "-i", str(out)], capture_output=True, text=True).stderr
+    assert "1080x1920" in probe and "aac" in probe
+    assert video.pick_track(date(2026, 11, 10), "max", long=True).name.startswith("lofi_largo_")
+    assert not video.pick_track(date(2026, 11, 10), "max").name.startswith("lofi_largo_")

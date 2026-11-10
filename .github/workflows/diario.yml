@@ -134,3 +134,16 @@ jobs:
           else
             python publish.py run --mode prepare
           fi
+
+      # Short diario de YouTube (todas las series en un vídeo), justo después de Instagram
+      - name: YouTube (Short del día)
+        if: steps.modo.outputs.instagram == 'publicar'
+        env:
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+        run: |
+          if python -c "import config, sys; sys.exit(0 if config.YOUTUBE_AUTOPUBLISH else 1)"; then
+            python wait_until.py "$(python -c 'import config; print(config.YOUTUBE_POST_TIME)')"
+            python youtube_cli.py short --privacy public
+          else
+            echo "YouTube desactivado (config.YOUTUBE_AUTOPUBLISH = False)"
+          fi

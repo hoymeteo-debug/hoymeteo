@@ -34,9 +34,9 @@ def ffmpeg_exe():
         return "ffmpeg"
 
 
-def pick_track(target_date, series_key):
-    """Pista distinta por serie y día (se van alternando)."""
-    tracks = sorted(MUSIC_DIR.glob("*.m4a"))
+def pick_track(target_date, series_key, long=False):
+    """Pista distinta por serie y día (se van alternando). long=True: versiones de 52 s (Short)."""
+    tracks = sorted(MUSIC_DIR.glob("lofi_largo_*.m4a" if long else "lofi_[0-9]*.m4a"))
     if not tracks:
         return None
     pos = list(config.SERIES).index(series_key) if series_key in config.SERIES else 0
@@ -121,6 +121,87 @@ def render_story_video(story_png, out_mp4, music=None, duration=DURATION):
         for i in range(int(duration * FPS)):
             t = i / FPS
             proc.stdin.write(still if t > end_anim else compose(final, bg, timed, t, crops).tobytes())
+    finally:
+        proc.stdin.close()
+    if proc.wait() != 0:
+        raise RuntimeError(f"ffmpeg falló al crear {out_mp4}")
+    return out_mp4
+
+
+# --- Short diario de YouTube: todas las series en un vídeo ------------------------------
+SEGMENT = 7.0      # segundos por serie
+INTRO, OUTRO = 1.8, 2.4
+FADE = 0.25        # fundido entre series
+
+
+def _card(lines, bg="#0E4A85", fg="#FFFFFF", sub="#BFD3EA", size=(1080, 1920)):
+    """Tarjeta de entrada o de cierre: logo de hoymeteo y texto, con los colores del perfil."""
+    import render
+    cv = render.Canvas(size[0], size[1], bg)
+    y = 1010
+    for text, px, color, bold in lines:
+        color = {"fg": fg, "sub": sub}[color]
+        for ln in cv.wrap(text, px, size[0] - 160, bold=bold, max_lines=2):
+            cv.text(size[0] / 2, y, ln, px, color, bold=bold, anchor="mm")
+            y += px * 1.25
+        y += 18
+    img = cv.img.resize(size, Image.LANCZOS)
+    logo_file = config.BASE / "docs" / "perfiles" / "hoymeteo.png"
+    if logo_file.exists():
+        logo = Image.open(logo_file).convert("RGB").resize((420, 420), Image.LANCZOS)
+        mask = Image.new("L", (420 * 4, 420 * 4), 0)
+        from PIL import ImageDraw
+        ImageDraw.Draw(mask).ellipse([0, 0, 420 * 4 - 1, 420 * 4 - 1], fill=255)
+        img.paste(logo, ((size[0] - 420) // 2, 520), mask.resize((420, 420), Image.LANCZOS))
+    return img
+
+
+def render_daily_short(story_pngs, out_mp4, date_text, music=None):
+    """Une las stories del día en un Short: entrada, una serie tras otra y cierre."""
+    story_pngs = [Path(p) for p in story_pngs if Path(p).exists()]
+    if not story_pngs:
+        raise RuntimeError("No hay stories para montar el Short")
+    intro = _card([("El tiempo de hoy en España", 64, "fg", True), (date_text, 40, "sub", False)])
+    outro = _card([("Cada mañana a las 7:00", 56, "fg", True), (f"Sigue a {config.HANDLE}", 40, "sub", False)])
+    segments = []
+    for png in story_pngs:
+        layout = json.loads(png.with_suffix(".json").read_text(encoding="utf-8"))
+        final = Image.open(png).convert("RGB")
+        timed = schedule(layout["elements"])
+        segments.append((final, Image.new("RGB", final.size, layout["bg"]), timed,
+                         {id(e): final.crop(tuple(e["box"])) for e, _, _ in timed}))
+    w, h = intro.size
+    starts = [INTRO + i * SEGMENT for i in range(len(segments))] + [INTRO + SEGMENT * len(segments)]
+    duration = starts[-1] + OUTRO
+
+    def frame_at(t):
+        if t < INTRO:
+            return intro
+        idx = int((t - INTRO) // SEGMENT)
+        if idx >= len(segments):
+            return outro
+        final, bg, timed, crops = segments[idx]
+        return compose(final, bg, timed, t - starts[idx], crops)
+
+    # Imagen con la que acaba cada tramo, para fundirla con el comienzo del siguiente
+    ends = [intro] + [seg[0] for seg in segments]
+
+    cmd = [ffmpeg_exe(), "-y", "-loglevel", "error",
+           "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{w}x{h}", "-r", str(FPS), "-i", "-"]
+    if music:
+        cmd += ["-i", str(music), "-af", f"afade=t=in:d=0.5,afade=t=out:st={duration - 2:.2f}:d=2",
+                "-c:a", "aac", "-b:a", "128k", "-ar", "48000"]
+    cmd += ["-t", f"{duration:.2f}", "-c:v", "libx264", "-preset", "veryfast", "-crf", "21",
+            "-pix_fmt", "yuv420p", "-profile:v", "high", "-movflags", "+faststart", str(out_mp4)]
+    proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+    try:
+        for i in range(int(duration * FPS)):
+            t = i / FPS
+            img = frame_at(t)
+            for k, b in enumerate(starts):
+                if b <= t < b + FADE:
+                    img = Image.blend(ends[k], img, ease_out((t - b) / FADE))
+            proc.stdin.write(img.tobytes())
     finally:
         proc.stdin.close()
     if proc.wait() != 0:

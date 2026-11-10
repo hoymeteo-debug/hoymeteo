@@ -1,0 +1,40 @@
+# Sube el Short del día (de la rama "media") a YouTube. Por defecto en privado: sirve para probar
+# y para la auditoría de YouTube. Mientras no esté auditado, YouTube lo deja privado de todas formas.
+name: "YouTube: prueba"
+
+on:
+  workflow_dispatch:
+    inputs:
+      privacidad:
+        description: "Privacidad"
+        type: choice
+        default: private
+        options: [private, unlisted, public]
+
+permissions:
+  contents: write
+
+jobs:
+  subir:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Europe/Madrid
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Material del día
+        run: |
+          git fetch -q --depth 1 origin media
+          mkdir -p media
+          git --work-tree=media checkout FETCH_HEAD -- .
+          git reset -q
+          ls media
+      - name: Subir el Short
+        env:
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+        run: |
+          d=$(ls media | sort | tail -1)
+          python youtube_cli.py short --privacy "${{ inputs.privacidad }}" --date "$d"

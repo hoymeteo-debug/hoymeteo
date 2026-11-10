@@ -5,7 +5,7 @@ Cada pista: acordes de piano eléctrico con séptimas, bajo suave, batería con 
 una melodía pentatónica escasa y el «crujido de vinilo» típico del lo-fi.
 Es determinista: la misma semilla da siempre la misma pista.
 
-  python tools/make_music.py            # genera music/lofi_1.m4a … lofi_8.m4a
+  python tools/make_music.py            # genera music/lofi_N.m4a (16 s) y lofi_largo_N.m4a (52 s)
 """
 import subprocess
 import sys
@@ -165,15 +165,17 @@ def save_m4a(samples, path):
     path.parent.mkdir(parents=True, exist_ok=True)
     stereo = np.stack([samples, samples], axis=1)
     cmd = ["ffmpeg", "-y", "-loglevel", "error", "-f", "f32le", "-ar", str(SR), "-ac", "2", "-i", "-",
-           "-c:a", "aac", "-b:a", "160k", "-ar", "48000", str(path)]
+           "-c:a", "aac", "-b:a", "128k", "-ar", "48000", str(path)]
     subprocess.run(cmd, input=stereo.tobytes(), check=True)
 
 
 def main():
     for i, (key, bpm, prog, seed) in enumerate(TRACKS, 1):
-        out = OUT / f"lofi_{i}.m4a"
-        save_m4a(track(key, bpm, prog, seed), out)
-        print(f"{out.name}: tonalidad {key}, {bpm} bpm, progresión {'-'.join(PROGRESSIONS[prog])}")
+        # Cortas (16 s) para las stories; largas (52 s) para el Short diario de YouTube
+        for name, secs in ((f"lofi_{i}.m4a", 16.0), (f"lofi_largo_{i}.m4a", 52.0)):
+            out = OUT / name
+            save_m4a(track(key, bpm, prog, seed, seconds=secs), out)
+            print(f"{out.name}: tonalidad {key}, {bpm} bpm, progresión {'-'.join(PROGRESSIONS[prog])}, {secs:.0f} s")
 
 
 if __name__ == "__main__":

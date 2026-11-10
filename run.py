@@ -100,6 +100,18 @@ def make_story_video(out, target, key):
         print(f"  aviso: no se pudo crear el vídeo de la story ({type(exc).__name__}: {exc})")
 
 
+def make_daily_short(out_root, target):
+    """Short de YouTube con todas las series del día. Si falla, no para nada."""
+    try:
+        import video
+        pngs = [out_root / k / "story.png" for k in config.SERIES]
+        video.render_daily_short(pngs, out_root / "short.mp4", captions.fecha_larga(target).capitalize(),
+                                 video.pick_track(target, "max", long=True))
+        print(f"- Short de YouTube: {out_root / 'short.mp4'}")
+    except Exception as exc:  # noqa: BLE001
+        print(f"  aviso: no se pudo crear el Short ({type(exc).__name__}: {exc})")
+
+
 def clean_dir(out):
     """Borra imágenes de una ejecución anterior para no mezclar diapositivas."""
     for pattern in ("*.png", "*.mp4", "*.json"):
@@ -193,6 +205,8 @@ def main():
             with open(out_root / "ERRORES.txt", "a", encoding="utf-8") as f:
                 f.write(msg + "\n")
 
+    if made:
+        make_daily_short(out_root, target)
     print(f"Listo: {made} series generadas en {out_root}")
 
 

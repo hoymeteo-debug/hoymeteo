@@ -24,6 +24,12 @@ TIKTOK_CLIENT_KEY = "sbaw6d4jvj09ewvqd5"  # Sandbox (pruebas). Cambiar por la de
 # antes, todo lo publicado por la API sale privado.
 TIKTOK_AUTOPUBLISH = False
 
+# YouTube: Short diario con todas las series. Client id de Google Cloud (no es secreto; el secreto
+# va en YT_CLIENT_SECRET). Sin auditoría de YouTube, lo subido por la API queda en privado.
+YOUTUBE_CLIENT_ID = ""
+YOUTUBE_AUTOPUBLISH = False
+YOUTUBE_POST_TIME = "07:06"
+
 HANDLE = "@hoymeteo"
 TIMEZONE = "Europe/Madrid"
 TOP_N = 30  # puestos del ranking
