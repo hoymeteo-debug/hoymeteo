@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conectar TikTok · HoyMeteo</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../estilo.css">
+</head>
+<body><main>
+<p class="eyebrow"><a href="../">HoyMeteo</a></p>
+<h1 id="title">Conectar TikTok</h1>
+<div class="card" id="box"><p>Esta página recibe la autorización de TikTok.</p></div>
+<script>
+  // TikTok vuelve aquí con ?code=… tras autorizar. El código solo vale unos minutos y una vez,
+  // y sin el secreto de la app no sirve para nada, así que mostrarlo no es un riesgo.
+  const p = new URLSearchParams(location.search);
+  const box = document.getElementById("box");
+  const code = p.get("code");
+  if (code) {
+    box.innerHTML = '<p><strong>Autorización recibida.</strong> Copia este código y pégalo en GitHub, ' +
+      'en el botón «Run workflow» de «TikTok: conectar» (tienes 5 minutos):</p>' +
+      '<p class="code" id="code"></p><button id="copy">Copiar código</button>' +
+      '<p><a href="https://github.com/hoymeteo-debug/hoymeteo/actions/workflows/tiktok-conectar.yml">' +
+      'Abrir «TikTok: conectar» en GitHub</a></p>';
+    document.getElementById("code").textContent = code;
+    document.getElementById("copy").onclick = async (e) => {
+      try { await navigator.clipboard.writeText(code); e.target.textContent = "Copiado ✓"; }
+      catch { e.target.textContent = "Selecciónalo y cópialo a mano"; }
+    };
+  } else if (p.get("error")) {
+    box.innerHTML = "<p><strong>TikTok no ha dado permiso:</strong> </p>";
+    box.firstChild.append(p.get("error_description") || p.get("error"));
+  }
+</script>
+</main></body>
+</html>

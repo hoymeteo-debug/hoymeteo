@@ -1,0 +1,21 @@
+/* Web de @hoymeteo · tipografía Inter, una sola columna, colores de la serie de máximas */
+@font-face { font-family: Inter; src: url("fonts/Inter-Medium.otf"); font-weight: 500; }
+@font-face { font-family: Inter; src: url("fonts/Inter-Bold.otf"); font-weight: 700; }
+:root { --bg: #FAEEDA; --text: #412402; --accent: #A32D2D; --muted: #854F0B; --card: #FDF6EC; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #1E1408; --text: #F6E7D2; --accent: #F08A6B; --muted: #D9A766; --card: #2A1D0E; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 500 17px/1.6 Inter, system-ui, sans-serif; }
+main { max-width: 680px; margin: 0 auto; padding: 48px 16px 64px; }
+h1 { font-size: 40px; line-height: 1.1; margin: 8px 0 16px; letter-spacing: -0.02em; }
+h2 { font-size: 22px; margin: 40px 0 8px; }
+.eyebrow { color: var(--muted); font-weight: 700; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
+a { color: var(--accent); text-underline-offset: 3px; }
+.card { background: var(--card); border-radius: 16px; padding: 24px; margin: 24px 0; }
+code, .code { font: 700 16px/1.4 ui-monospace, Menlo, monospace; word-break: break-all; }
+button { font: 700 16px Inter, sans-serif; color: #fff; background: var(--accent); border: 0;
+  border-radius: 12px; padding: 12px 20px; cursor: pointer; transition: transform .15s cubic-bezier(.2,.8,.2,1), opacity .15s; }
+button:active { transform: scale(0.97); }
+footer { margin-top: 48px; color: var(--muted); font-size: 14px; }
+nav a { margin-right: 16px; }
