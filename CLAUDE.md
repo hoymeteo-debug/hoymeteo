@@ -63,6 +63,16 @@ TikTok personal y en privado. **Al aprobarse:** 1) client key de Production en c
 `TIKTOK_AUTOPUBLISH = True` (por serie a su hora, `PUBLIC_TO_EVERYONE`, **en vídeo**: la story animada con nuestra música; el carrusel de fotos lleva música automática de TikTok que no se puede elegir y a Víctor no le gustó); 5) Víctor pone la cuenta
 pública. Si la rechazan: valorar intermediario de pago (Ayrshare, Publer…), consultando antes.
 
+**YouTube (10-nov-2026, elegido por Víctor): un Short diario con todo.** `video.render_daily_short`:
+entrada con logo y fecha, las 6 stories animadas (7 s cada una, fundidos) y cierre «Sigue a @hoymeteo»;
+~46 s con música larga (`music/lofi_largo_*`). Lo monta `run.py` (`output/<fecha>/short.mp4`),
+`publish.py jpeg` lo copia a `media/`. Subida con `youtube.py`/`youtube_cli.py` (OAuth con
+refresh token cifrado en `youtube_state.enc`, clave = `YT_CLIENT_SECRET`; client id en
+`config.YOUTUBE_CLIENT_ID`). Workflows `youtube-conectar.yml` y `youtube-prueba.yml`; en `diario.yml`
+sube a las 07:06 si `YOUTUBE_AUTOPUBLISH`. Pendiente de Víctor: proyecto de Google Cloud, client id y
+secret, autorizar el canal y pedir la auditoría (sin ella, lo subido queda privado). La app de Google
+debe estar **en producción**, no en prueba (si no, el token caduca a los 7 días).
+
 **TikTok preparado (10-nov-2026), pendiente de Víctor:** `tiktok.py` + `tiktok_cli.py`, web en
 `docs/` (privacidad, condiciones, página de retorno `/tiktok/` que muestra el código), workflows
 `web.yml` (Pages por Actions, incluye la rama `media` en `/media/`), `tiktok-conectar.yml` y
