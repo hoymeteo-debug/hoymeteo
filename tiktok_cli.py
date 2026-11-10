@@ -23,7 +23,7 @@ REDIRECT_URI = f"{SITE}/tiktok/"
 
 
 def client():
-    key = os.environ.get("TIKTOK_CLIENT_KEY") or config.TIKTOK_CLIENT_KEY
+    key = config.TIKTOK_CLIENT_KEY or os.environ.get("TIKTOK_CLIENT_KEY", "")
     return TikTok(key, os.environ.get("TIKTOK_CLIENT_SECRET", ""), REDIRECT_URI)
 
 
@@ -46,7 +46,7 @@ def main():
 
     try:
         if args.command == "url":
-            key = os.environ.get("TIKTOK_CLIENT_KEY") or config.TIKTOK_CLIENT_KEY
+            key = config.TIKTOK_CLIENT_KEY or os.environ.get("TIKTOK_CLIENT_KEY", "")
             print(TikTok(key, "-", REDIRECT_URI).authorize_url())
             return
         tk = client()
