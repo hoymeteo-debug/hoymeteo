@@ -41,6 +41,9 @@ def export_jpeg(target: date):
         dst.parent.mkdir(parents=True, exist_ok=True)
         Image.open(png).convert("RGB").save(dst, "JPEG", quality=92, optimize=True, progressive=False)
         count += 1
+    for caption in src_root.glob("*/caption.txt"):  # TikTok lo lee desde aquí
+        (MEDIA_DIR / target.isoformat() / caption.parent.name / "caption.txt").write_text(
+            caption.read_text(encoding="utf-8"), encoding="utf-8")
     print(f"{count} imágenes JPEG en {MEDIA_DIR / target.isoformat()}")
 
 

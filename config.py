@@ -18,6 +18,12 @@ INSTAGRAM_AUTOPUBLISH = True  # aprobado por Víctor el 10-nov-2026
 # unificado no permite averiguarlo, así que se fija aquí. El secreto IG_USER_ID lo sustituye.
 INSTAGRAM_USER_ID = "17841475798213052"
 
+# TikTok: client key de la app (no es secreta; el secreto va en TIKTOK_CLIENT_SECRET).
+TIKTOK_CLIENT_KEY = ""
+# Publicar en TikTok cada mañana. Solo tiene sentido cuando TikTok apruebe la app (auditoría);
+# antes, todo lo publicado por la API sale privado.
+TIKTOK_AUTOPUBLISH = False
+
 HANDLE = "@hoymeteo"
 TIMEZONE = "Europe/Madrid"
 TOP_N = 30  # puestos del ranking

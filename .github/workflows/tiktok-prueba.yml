@@ -1,0 +1,65 @@
+# Publicación de prueba en TikTok con las imágenes del día (rama "media").
+# Sin la auditoría de TikTok solo se puede publicar en privado (SELF_ONLY) y con la cuenta
+# en modo privado. Sirve para grabar el vídeo de demostración que pide la revisión.
+name: "TikTok: prueba"
+
+on:
+  workflow_dispatch:
+    inputs:
+      serie:
+        description: "Serie a publicar"
+        type: choice
+        default: max
+        options: [max, min, rain, wind]
+      privacidad:
+        description: "Privacidad"
+        type: choice
+        default: SELF_ONLY
+        options: [SELF_ONLY, PUBLIC_TO_EVERYONE]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: tiktok
+  cancel-in-progress: false
+
+jobs:
+  web:
+    uses: ./.github/workflows/web.yml
+
+  publicar:
+    needs: web
+    runs-on: ubuntu-latest
+    env:
+      TZ: Europe/Madrid
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Imágenes del día
+        run: |
+          git fetch -q --depth 1 origin media
+          mkdir -p media
+          git --work-tree=media checkout FETCH_HEAD -- .
+          git reset -q
+          ls media
+      - name: Publicar en TikTok
+        env:
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+        run: |
+          d=$(ls media | sort | tail -1)
+          python tiktok_cli.py post --serie "${{ inputs.serie }}" --privacy "${{ inputs.privacidad }}" --date "$d"
+      - name: Guardar la autorización renovada
+        if: always()
+        run: |
+          git config user.name "hoymeteo-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tiktok_state.enc
+          git diff --cached --quiet || git commit -m "TikTok: autorización renovada"
+          git push

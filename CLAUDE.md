@@ -31,6 +31,15 @@ antiguas desaparecen) y se sirven por raw.githubusercontent.com. `INSTAGRAM_AUTO
 la ejecución diaria publica carrusel + story de cada serie a su hora. A mano: botón
 "Run workflow" con modo nada / comprobar / preparar / publicar.
 
+**TikTok preparado (10-nov-2026), pendiente de Víctor:** `tiktok.py` + `tiktok_cli.py`, web en
+`docs/` (privacidad, condiciones, página de retorno `/tiktok/` que muestra el código), workflows
+`web.yml` (Pages por Actions, incluye la rama `media` en `/media/`), `tiktok-conectar.yml` y
+`tiktok-prueba.yml`. Autorización guardada **cifrada** en `tiktok_state.enc` con clave derivada de
+`TIKTOK_CLIENT_SECRET` (el refresh token rota en cada renovación). Pasos de Víctor en
+`GUIA_TIKTOK.md`. Falta: activar Pages (Source: GitHub Actions), client key en
+`config.TIKTOK_CLIENT_KEY`, archivo de verificación de URL en `docs/`, conectar, prueba privada,
+revisión. Luego integrar en `diario.yml` con `TIKTOK_AUTOPUBLISH`.
+
 Archivos: `run.py` (CLI), `config.py` (series, colores, textos), `aemet_client.py` (cliente y
 parser), `data_sources.py` (datos reales/demo y rankings), `render.py` (Pillow), `captions.py`,
 `municipios.csv` (≈110 municipios, código INE de provincia), `README.md`.

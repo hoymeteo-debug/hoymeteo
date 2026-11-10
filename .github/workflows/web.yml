@@ -1,0 +1,45 @@
+# Publica la web (docs/) en GitHub Pages: https://hoymeteo-debug.github.io/hoymeteo/
+# Incluye en /media/ las imágenes del día (rama "media"), que TikTok descarga desde aquí
+# porque solo acepta URL de un dominio verificado.
+name: Web
+
+# Se lanza a mano (o desde otros workflows). Cuando Pages esté activado se puede añadir
+#   push: {branches: [main], paths: ["docs/**"]}
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  desplegar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Imágenes del día
+        run: |
+          mkdir -p _site
+          cp -r docs/. _site/
+          if git fetch -q --depth 1 origin media; then
+            mkdir -p _site/media
+            git --work-tree=_site/media checkout FETCH_HEAD -- .
+          fi
+          find _site -maxdepth 3 | head -30
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deploy
+        uses: actions/deploy-pages@v4

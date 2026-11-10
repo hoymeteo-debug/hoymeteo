@@ -1,0 +1,36 @@
+# Conecta la cuenta de TikTok (una sola vez). El código lo da la página
+# https://hoymeteo-debug.github.io/hoymeteo/tiktok/ tras autorizar; caduca en minutos.
+name: "TikTok: conectar"
+
+on:
+  workflow_dispatch:
+    inputs:
+      code:
+        description: "Código de autorización (lo muestra la web al volver de TikTok)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  conectar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Cambiar el código por la autorización
+        env:
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          CODE: ${{ inputs.code }}
+        run: python tiktok_cli.py connect --code "$CODE"
+      - name: Guardar la autorización cifrada
+        run: |
+          git config user.name "hoymeteo-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tiktok_state.enc
+          git commit -m "TikTok conectado"
+          git push
