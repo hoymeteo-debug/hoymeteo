@@ -66,23 +66,44 @@ class Instagram:
         if "graph.instagram.com" in self.base:
             self.user_id = str(self._call("GET", "me", fields="user_id,username")["user_id"])
             return self.user_id
-        # Token de Facebook: 1) páginas con cuenta de Instagram vinculada
-        try:
-            pages = self._call("GET", "me/accounts", fields="instagram_business_account{id,username}")
-            for p in pages.get("data", []):
-                if p.get("instagram_business_account"):
-                    self.user_id = p["instagram_business_account"]["id"]
-                    return self.user_id
-        except InstagramError:
-            pass
-        # 2) el propio token dice a qué cuenta da permiso de publicación
-        info = self._call("GET", "debug_token", input_token=self.token).get("data", {})
-        for scope in info.get("granular_scopes", []):
-            if scope.get("scope") == "instagram_content_publish" and scope.get("target_ids"):
-                self.user_id = scope["target_ids"][0]
+        # Token de Facebook: según cómo se generó, la cuenta aparece en un sitio u otro.
+        notes = []
+
+        def first_ig(items, *keys):
+            for it in items or []:
+                for k in keys:
+                    v = it.get(k)
+                    if isinstance(v, dict) and v.get("id"):
+                        return v["id"]
+                    if isinstance(v, dict) and v.get("data"):
+                        return v["data"][0]["id"]
+            return None
+
+        attempts = [
+            ("me/accounts", {"fields": "name,instagram_business_account{id,username}"},
+             lambda b: first_ig(b.get("data"), "instagram_business_account")),
+            ("me/businesses", {"fields": "name,owned_instagram_accounts{id,username},instagram_accounts{id,username}"},
+             lambda b: first_ig(b.get("data"), "owned_instagram_accounts", "instagram_accounts")),
+            ("me/instagram_accounts", {"fields": "id,username"},
+             lambda b: (b.get("data") or [{}])[0].get("id")),
+            ("debug_token", {"input_token": self.token},
+             lambda b: next((s["target_ids"][0] for s in b.get("data", {}).get("granular_scopes", [])
+                             if s.get("scope") == "instagram_content_publish" and s.get("target_ids")), None)),
+        ]
+        for path, params, pick in attempts:
+            try:
+                found = pick(self._call("GET", path, **params))
+            except InstagramError as exc:
+                notes.append(f"{path}: {exc}")
+                continue
+            except (KeyError, IndexError, TypeError):
+                found = None
+            if found:
+                self.user_id = str(found)
                 return self.user_id
-        raise InstagramError("No encuentro la cuenta de Instagram del token. "
-                             "Añade el secreto IG_USER_ID con el id de la cuenta.")
+            notes.append(f"{path}: sin cuenta de Instagram")
+        raise InstagramError("No encuentro la cuenta de Instagram del token. Intentos:\n    "
+                             + "\n    ".join(notes))
 
     def account_info(self):
         uid = self.resolve_user_id()
