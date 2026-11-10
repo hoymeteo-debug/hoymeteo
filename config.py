@@ -143,7 +143,7 @@ SERIES = {
             "pillar_text": ["#FFFFFF", "#FFFFFF", "#26215C"],
         },
     },
-    # 07:20: hueco de la serie de nieve. Fuera de temporada de esquí se publica el contraste.
+    # 07:04: contraste (la serie de nieve está descartada).
     "contrast": {
         "label": "Contraste",
         "title": "Hoy habrá más contraste en",

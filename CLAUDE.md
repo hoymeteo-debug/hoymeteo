@@ -46,7 +46,7 @@ anota en `output/<fecha>/ERRORES.txt`, se publica el resto y la ejecución acaba
 temporada de esquí. «Hoy habrá más contraste en» = máxima − mínima oficiales (diaria). Cada fila lleva
 la hora de ambas, de la horaria («↓14° a las 7 h · ↑28° a las 15 h»; si se mantiene varias horas, la
 del medio). Las horas solo se muestran si la horaria trae el día completo (24 h); si no, «↓14° · ↑28°».
-Cuando llegue la serie de nieve/esquí, decidir con Víctor si el contraste se mueve a otra hora.
+Serie fija (la de nieve está descartada).
 
 **Stories en vídeo con música (10-nov-2026, aprobado por Víctor):** `video.py` anima cada `story.png`
 (12 s, 30 fps, H.264 + AAC) con los elementos que anota `render.py` en `story.json`: cabecera → podio
@@ -79,15 +79,15 @@ parser), `data_sources.py` (datos reales/demo y rankings), `render.py` (Pillow),
 ## Decisiones ya tomadas (no cambiar sin preguntar)
 
 - **Titulares en frase:** "Hoy hará más calor en", "Hoy hará más frío en", "Hoy lloverá más en",
-  "Hoy hará más viento en", "Hoy nevará más en / se podrá esquiar más en".
+  "Hoy hará más viento en", "Hoy habrá más contraste en".
 - **Datos de previsión de hoy**, no medidos, para poder publicar a las 7:00. Etiqueta "PREVISIÓN".
 - **Diseño:** podio real (2-1-3) con pilares + tabla; top **30**, sin más municipios.
   Un color por serie: máximas cálido/rojo, mínimas azul, lluvia verde azulado, viento violeta,
-  nieve gris hielo, avisos rojo suave. Tipografía Inter. Sin medallas.
+  contraste fucsia, avisos rojo suave. Tipografía Inter. Sin medallas.
 - **Formato:** carrusel en el feed (portada con podio + 10 filas por diapositiva) y story 9:16 con
   las 30 filas (zonas seguras ~250 px arriba y abajo).
 - **Calendario (cambiado por Víctor el 10-nov-2026):** todo seguido, una serie por minuto: 07:00 máximas ·
-  07:01 mínimas · 07:02 lluvia · 07:03 viento · 07:04 contraste (nieve/esquí en temporada) · 07:05 avisos.
+  07:01 mínimas · 07:02 lluvia · 07:03 viento · 07:04 contraste · 07:05 avisos.
   Futuras series (mapa, "hoy vs ayer", récords del domingo) a continuación, minuto a minuto.
 - **Texto de Instagram (copy):** 1) titular con el primer puesto y su dato; 2) los **5 primeros
   como hashtag de municipio**, sin tildes (#Malaga), con su valor; 3) invitación a deslizar;
@@ -111,9 +111,7 @@ parser), `data_sources.py` (datos reales/demo y rankings), `render.py` (Pillow),
    a menos grave con **zona, motivo (icono + cifra) y color** (rojo/naranja/amarillo, con texto
    del nivel además del color), resumen con recuento por color. Hashtags de provincia/zona,
    no de municipio. Sin avisos: post "Hoy no hay avisos meteorológicos". Citar siempre AEMET.
-5. **Serie de nieve.** Ranking por **km esquiables** con **número de pistas abiertas**. No sale
-   de AEMET: sale del parte de cada estación. Investigar fuentes reutilizables. Activar solo en
-   temporada (normalmente desde diciembre).
+5. ~~Serie de nieve~~ **descartada por Víctor (10-nov-2026)**: no se hace. El hueco de las 07:04 es del contraste.
 6. **Publicación automática.** Instagram Graph API (cuenta profesional vinculada a página de
    Facebook; carrusel y stories) y TikTok Content Posting API (requiere aprobar la app).
    Para las URL públicas que exige Instagram, valorar primero opciones gratuitas (GitHub Pages / raw del repo).
