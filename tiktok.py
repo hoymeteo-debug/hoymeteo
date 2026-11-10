@@ -124,6 +124,16 @@ class TikTok:
         }
         return self._api("post/publish/content/init/", payload)["publish_id"]
 
+    def post_video(self, video_url, caption, privacy_level, cover_ms=4500):
+        """Publica un vídeo (la story animada con nuestra música lo-fi). Devuelve el publish_id."""
+        payload = {
+            "post_info": {"title": caption[:2200], "privacy_level": privacy_level,
+                          "disable_duet": False, "disable_comment": False, "disable_stitch": False,
+                          "video_cover_timestamp_ms": cover_ms},
+            "source_info": {"source": "PULL_FROM_URL", "video_url": video_url},
+        }
+        return self._api("post/publish/video/init/", payload)["publish_id"]
+
     def wait_published(self, publish_id, timeout=300):
         deadline = time.time() + timeout
         while True:

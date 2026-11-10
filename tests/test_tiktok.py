@@ -25,7 +25,7 @@ class FakeSession:
                 return Resp({"error": "invalid_grant", "error_description": "caducado"}, 400)
             return Resp({"access_token": "act", "refresh_token": f"rft{self.n}", "open_id": "o1", "scope": "video.publish"})
         assert headers["Authorization"] == "Bearer act"
-        if url.endswith("content/init/"):
+        if url.endswith("content/init/") or url.endswith("video/init/"):
             return Resp({"data": {"publish_id": "p1"}, "error": {"code": "ok"}})
         if url.endswith("status/fetch/"):
             return Resp({"data": {"status": "PUBLISH_COMPLETE"}, "error": {"code": "ok"}})
@@ -79,3 +79,13 @@ def test_enlace_de_autorizacion():
     url = tk().authorize_url()
     assert "client_key=ck" in url and "video.publish" in url.replace("%2C", ",")
     assert "redirect_uri=https%3A%2F%2Fx%2Ftiktok%2F" in url
+
+
+def test_publicar_video():
+    s = FakeSession()
+    client = tk(s)
+    client.exchange_code("CODE")
+    assert client.post_video("https://x/story.mp4", "texto", "SELF_ONLY") == "p1"
+    payload = s.calls[-1][1]
+    assert payload["source_info"] == {"source": "PULL_FROM_URL", "video_url": "https://x/story.mp4"}
+    assert payload["post_info"]["privacy_level"] == "SELF_ONLY"

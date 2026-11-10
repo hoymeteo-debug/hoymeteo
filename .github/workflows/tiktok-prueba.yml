@@ -11,6 +11,11 @@ on:
         type: choice
         default: max
         options: [max, min, rain, wind]
+      tipo:
+        description: "Formato"
+        type: choice
+        default: video
+        options: [video, fotos]
       privacidad:
         description: "Privacidad"
         type: choice
@@ -54,7 +59,7 @@ jobs:
           TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
         run: |
           d=$(ls media | sort | tail -1)
-          python tiktok_cli.py post --serie "${{ inputs.serie }}" --privacy "${{ inputs.privacidad }}" --date "$d"
+          python tiktok_cli.py post --serie "${{ inputs.serie }}" --tipo "${{ inputs.tipo }}" --privacy "${{ inputs.privacidad }}" --date "$d"
       - name: Guardar la autorización renovada
         if: always()
         run: |

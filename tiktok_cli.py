@@ -42,6 +42,8 @@ def main():
     ap.add_argument("--privacy", default="SELF_ONLY",
                     help="SELF_ONLY (solo yo, obligatorio sin auditoría) o PUBLIC_TO_EVERYONE")
     ap.add_argument("--date", help="AAAA-MM-DD (por defecto, hoy en Madrid)")
+    ap.add_argument("--tipo", default="video", choices=["video", "fotos"],
+                    help="video: la story animada con música propia (por defecto); fotos: carrusel")
     args = ap.parse_args()
 
     try:
@@ -78,11 +80,14 @@ def main():
         slides = sorted(media.glob("slide_*.jpg"), key=lambda p: int(p.stem.split("_")[1]))
         if not slides:
             sys.exit(f"No hay imágenes en {media}")
-        urls = [f"{SITE}/media/{target.isoformat()}/{args.serie}/{p.name}" for p in slides]
+        base = f"{SITE}/media/{target.isoformat()}/{args.serie}"
         caption = (media / "caption.txt").read_text(encoding="utf-8")
-        title = caption.splitlines()[0]
-        publish_id = tk.post_photos(urls, title, caption, args.privacy)
-        print(f"Enviado a TikTok ({cfg['label']}, {args.privacy}): {publish_id}")
+        if args.tipo == "video" and (media / "story.mp4").exists():
+            publish_id = tk.post_video(f"{base}/story.mp4", caption, args.privacy)
+        else:
+            title = caption.splitlines()[0]
+            publish_id = tk.post_photos([f"{base}/{p.name}" for p in slides], title, caption, args.privacy)
+        print(f"Enviado a TikTok ({cfg['label']}, {args.tipo}, {args.privacy}): {publish_id}")
         tk.wait_published(publish_id)
         print("Publicado en TikTok")
     except TikTokError as exc:
