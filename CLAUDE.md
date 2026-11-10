@@ -161,8 +161,8 @@ Facebook; autorizar la app de Meta y TikTok; aprobar la primera publicación rea
 hoymeteo es la primera cuenta de una red de cuentas «hoy…». Matriz de decisión:
 https://claude.ai/artifact/LJp1CTMp2VKPVs4MvWhEd4 (privada de Víctor).
 
-- **Ola 1, una cuenta cada vez, en este orden:** hoygasolina → hoyluz → hoyreto (HOY PLAY) →
-  hoyhistoria → hoyfutbol. Cada una reutiliza el sistema de hoymeteo (GitHub Actions, apps de Meta y
+- **Ola 1, una cuenta cada vez, en este orden:** hoygasolina → hoyenergia (luz + gas) → hoyreto (HOY PLAY) →
+  historia (nombre por decidir) → hoypartidos (fútbol). Cada una reutiliza el sistema de hoymeteo (GitHub Actions, apps de Meta y
   TikTok ya auditadas/configuradas, vídeo animado con música propia).
 - **Decisiones de Víctor:** hoyluz entra en lugar de hoytrending. hoysanto es cuenta **propia**
   (historia y religión separadas). hoyalergia = serie de primavera dentro de hoymeteo. hoyhipoteca va
@@ -175,3 +175,7 @@ https://claude.ai/artifact/LJp1CTMp2VKPVs4MvWhEd4 (privada de Víctor).
   hoygasolina, hoyreto, hoysanto libres en YouTube y TikTok (y .com/.es sin DNS). hoyluz, hoyfutbol,
   hoyestudio ocupados en TikTok; hoyhistoria ocupado en YouTube. Alternativa libre: sufijo `.es`
   (hoyluz.es, hoyfutbol.es, hoyhistoria.es…). hoymeteo libre en YouTube: reservar.
+- **Nombres decididos (10-nov):** fútbol = **hoypartidos**; luz = **hoyenergia** (luz y también gas; sin
+  tilde en los perfiles). Historia: sin sufijos; candidatas libres en YouTube y TikTok: hoyhistorias,
+  hoyhacehistoria, hoytaldia, hoyefemerides, hoypasado. hoymeteo en YouTube es de Víctor (cuenta de
+  Google de meteo), pero el identificador @hoymeteo aún no está reclamado.
