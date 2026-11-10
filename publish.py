@@ -78,12 +78,15 @@ def client():
 
 
 def cmd_check():
+    import json
     ig = client()
-    try:
-        me = ig._call("GET", "me", fields="id,name")
-        print(f"Token de: {me.get('name')} (id {me.get('id')})")
-    except InstagramError as exc:
-        print(f"No se pudo leer el dueño del token: {exc}")
+    print(f"Token: empieza por {ig.token[:3]}…, {len(ig.token)} caracteres · API {ig.base}")
+    for path, fields in (("me", "id,name"), ("me/accounts", "id,name,instagram_business_account")):
+        try:
+            body = ig._call("GET", path, fields=fields)
+            print(f"{path}: {json.dumps(body, ensure_ascii=False)[:400]}")
+        except InstagramError as exc:
+            print(f"{path}: {exc}")
     info = ig.account_info()
     print(f"Cuenta: @{info.get('username')} · publicaciones: {info.get('media_count')}")
     print(f"Límite de publicación: {info.get('publishing_limit')}")
