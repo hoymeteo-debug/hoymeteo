@@ -60,6 +60,8 @@ def fetch_records(api_key, municipios, target_date, use_cache=True, log=print):
         values.update(horaria or {})
         if diaria:
             values.update({k: v for k, v in diaria.items() if v is not None})
+        if values.get("tmax") is not None and values.get("tmin") is not None:
+            values["amp_c"] = values["tmax"] - values["tmin"]
         if elaborado and str(elaborado)[:10] != target_date.isoformat():
             stale += 1
         records.append({"name": row["nombre"], "hashtag": row["hashtag"], **values})
@@ -97,7 +99,9 @@ def demo_records(municipios, target_date):
             "name": m["nombre"], "hashtag": m["hashtag"],
             "tmax": float(round(rng.uniform(*tmax_r))), "tmin": float(round(rng.uniform(*tmin_r))),
             "rain_mm": round(rain, 1), "gust_kmh": float(round(gust)),
+            "tmax_h": rng.choice([14, 15, 16]), "tmin_h": rng.choice([6, 7, 8]),
         })
+        records[-1]["amp_c"] = records[-1]["tmax"] - records[-1]["tmin"]
     return records
 
 
@@ -109,4 +113,7 @@ def build_ranking(records, series_cfg, top_n=config.TOP_N):
     if min_value is not None:
         items = [r for r in items if r[field] >= min_value]
     items.sort(key=lambda r: (r[field] if series_cfg["ascending"] else -r[field], r["name"]))
-    return [{"name": r["name"], "hashtag": r["hashtag"], "value": r[field]} for r in items[:top_n]]
+    detail = series_cfg.get("detail")
+    return [{"name": r["name"], "hashtag": r["hashtag"], "value": r[field],
+             **({"detail": detail(r), "detail_short": series_cfg["detail_short"](r)} if detail else {})}
+            for r in items[:top_n]]

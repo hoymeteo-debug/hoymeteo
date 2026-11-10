@@ -23,7 +23,8 @@ def build_caption(cfg, ranking, date):
     lines = [cfg["headline"].format(name=top["name"], value=format_value(cfg, top["value"])), ""]
     lines.append(cfg["ranking_line"].format(fecha=fecha_larga(date)))
     for i, item in enumerate(ranking[:5]):
-        lines.append(f"{KEYCAPS[i]} {item['hashtag']} {format_value(cfg, item['value'])}")
+        extra = f" ({item['detail']})" if item.get("detail") else ""
+        lines.append(f"{KEYCAPS[i]} {item['hashtag']} {format_value(cfg, item['value'])}{extra}")
     lines += [
         "",
         f"➡️ Desliza para ver el ranking completo (top {len(ranking)}).",

@@ -53,6 +53,16 @@ def parts_wind(v):
     return _num(v), " km/h"
 
 
+def _contrast_detail(r, short=False):
+    """'↓14° a las 7 h · ↑28° a las 14 h' (o sin horas si el día no está completo)."""
+    lo, hi = _num(r["tmin"]) + "°", _num(r["tmax"]) + "°"
+    if r.get("tmin_h") is None or r.get("tmax_h") is None:
+        return f"↓{lo} · ↑{hi}"
+    if short:
+        return f"↓{lo} {r['tmin_h']} h · ↑{hi} {r['tmax_h']} h"
+    return f"↓{lo} a las {r['tmin_h']} h · ↑{hi} a las {r['tmax_h']} h"
+
+
 # Orden = orden de publicación (07:00 a 07:15)
 SERIES = {
     "max": {
@@ -131,6 +141,29 @@ SERIES = {
             "strip_from": "#3C3489", "strip_to": "#AFA9EC",
             "pillars": ["#534AB7", "#7F77DD", "#AFA9EC"],
             "pillar_text": ["#FFFFFF", "#FFFFFF", "#26215C"],
+        },
+    },
+    # 07:20: hueco de la serie de nieve. Fuera de temporada de esquí se publica el contraste.
+    "contrast": {
+        "label": "Contraste",
+        "title": "Hoy habrá más contraste en",
+        "subtitle": "Diferencia entre la mínima y la máxima de hoy",
+        "icon": "contrast",
+        "post_time": "07:20",
+        "field": "amp_c",
+        "ascending": False,
+        "min_items": 3,
+        "parts": parts_temp,
+        "detail": lambda r: _contrast_detail(r, short=False),
+        "detail_short": lambda r: _contrast_detail(r, short=True),
+        "headline": "🌡️ Hoy habrá más contraste en {name}: {value} de diferencia entre la mínima y la máxima",
+        "ranking_line": "Diferencia entre la mínima y la máxima previstas para hoy, {fecha}:",
+        "hashtags": "#ElTiempo #Temperaturas #AEMET",
+        "colors": {
+            "bg": "#EEF2F5", "text": "#1C2A35", "accent": "#3F5F78", "label": "#4E6A80",
+            "strip_from": "#2B4559", "strip_to": "#A9BFCF",
+            "pillars": ["#3F5F78", "#6B8AA3", "#A9BFCF"],
+            "pillar_text": ["#FFFFFF", "#FFFFFF", "#1C2A35"],
         },
     },
     # Serie de avisos (Meteoalerta): no es un ranking; la genera avisos.py

@@ -26,7 +26,8 @@ def load(name):
 def test_horaria_dia_completo():
     values, elaborado = parse_horaria(load("horaria_28079.json"), DAY)
     assert elaborado == "2026-11-09T20:59:08"
-    assert values == {"tmax": 16.0, "tmin": 13.0, "rain_mm": 10.2, "gust_kmh": 38.0, "horas": 24}
+    assert values == {"tmax": 16.0, "tmin": 13.0, "rain_mm": 10.2, "gust_kmh": 38.0, "horas": 24,
+                      "tmax_h": 13, "tmin_h": 2}
 
 
 def test_horaria_primer_dia_parcial():
@@ -34,6 +35,11 @@ def test_horaria_primer_dia_parcial():
     values, _ = parse_horaria(load("horaria_28079.json"), date(2026, 11, 9))
     assert values["horas"] == 4
     assert values["gust_kmh"] == 26.0
+
+
+def test_horaria_dia_parcial_sin_horas_de_max_min():
+    values, _ = parse_horaria(load("horaria_28079.json"), date(2026, 11, 9))
+    assert values["tmax_h"] is None and values["tmin_h"] is None
 
 
 def test_horaria_rachas_ignoran_entradas_de_viento_medio():
@@ -145,3 +151,16 @@ def test_caption_estructura():
     assert "#Almeria 22°" in text
     assert "Fuente: AEMET" in text
     assert "Sigue @hoymeteo" in text
+
+
+# --- Contraste ---------------------------------------------------------------------
+def test_contraste_con_horas():
+    recs = [{"name": "Murcia", "hashtag": "#Murcia", "tmax": 28.0, "tmin": 14.0, "amp_c": 14.0, "tmax_h": 15, "tmin_h": 7},
+            {"name": "Vigo", "hashtag": "#Vigo", "tmax": 16.0, "tmin": 12.0, "amp_c": 4.0, "tmax_h": None, "tmin_h": None}]
+    rk = ds.build_ranking(recs, config.SERIES["contrast"])
+    assert rk[0]["name"] == "Murcia"
+    assert rk[0]["detail"] == "↓14° a las 7 h · ↑28° a las 15 h"
+    assert rk[0]["detail_short"] == "↓14° 7 h · ↑28° 15 h"
+    assert rk[1]["detail"] == "↓12° · ↑16°"  # sin día completo no se inventan horas
+    text = captions.build_caption(config.SERIES["contrast"], rk, DAY)
+    assert "#Murcia 14° (↓14° a las 7 h · ↑28° a las 15 h)" in text

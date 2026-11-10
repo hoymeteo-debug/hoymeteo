@@ -181,7 +181,9 @@ def parse_horaria(payload, target_date):
     if dia is None:
         return None, elaborado
 
-    temps = [t for t in (_to_float(x.get("value")) for x in dia.get("temperatura", [])) if t is not None]
+    hourly = [(int(x["periodo"]), _to_float(x.get("value"))) for x in dia.get("temperatura", [])
+              if str(x.get("periodo", "")).isdigit() and _to_float(x.get("value")) is not None]
+    temps = [t for _, t in hourly]
     rains = [r for r in (_to_float(x.get("value")) for x in dia.get("precipitacion", [])) if r is not None]
     gusts = []
     for x in dia.get("vientoAndRachaMax", []):
@@ -196,4 +198,14 @@ def parse_horaria(payload, target_date):
         "rain_mm": round(sum(rains), 1) if rains else None,
         "gust_kmh": max(gusts) if gusts else None,
         "horas": len(dia.get("temperatura", [])),
+        # Hora (local) de la máxima y la mínima. Si se mantiene varias horas, la del medio.
+        # Solo con el día completo: si falta la madrugada, la hora de la mínima engañaría.
+        "tmax_h": _peak_hour(hourly, max) if len(hourly) >= 24 else None,
+        "tmin_h": _peak_hour(hourly, min) if len(hourly) >= 24 else None,
     }, elaborado
+
+
+def _peak_hour(hourly, pick):
+    best = pick(t for _, t in hourly)
+    hours = [h for h, t in hourly if t == best]
+    return hours[(len(hours) - 1) // 2]

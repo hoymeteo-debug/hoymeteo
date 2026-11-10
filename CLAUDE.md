@@ -41,6 +41,12 @@ por color + 8 filas, resto equilibrado hasta 10 diapositivas; story con 12 filas
 única «Hoy no hay avisos». Publica a las 07:25. Si falla la descarga NO se publica «no hay avisos»: se
 anota en `output/<fecha>/ERRORES.txt`, se publica el resto y la ejecución acaba en error (correo).
 
+**Serie de contraste (10-nov-2026, elegida por Víctor):** ocupa el hueco de las 07:20 mientras no haya
+temporada de esquí. «Hoy habrá más contraste en» = máxima − mínima oficiales (diaria). Cada fila lleva
+la hora de ambas, de la horaria («↓14° a las 7 h · ↑28° a las 15 h»; si se mantiene varias horas, la
+del medio). Las horas solo se muestran si la horaria trae el día completo (24 h); si no, «↓14° · ↑28°».
+Cuando llegue la serie de nieve/esquí, decidir con Víctor si el contraste se mueve a otra hora.
+
 **TikTok preparado (10-nov-2026), pendiente de Víctor:** `tiktok.py` + `tiktok_cli.py`, web en
 `docs/` (privacidad, condiciones, página de retorno `/tiktok/` que muestra el código), workflows
 `web.yml` (Pages por Actions, incluye la rama `media` en `/media/`), `tiktok-conectar.yml` y

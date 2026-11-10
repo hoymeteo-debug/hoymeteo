@@ -128,6 +128,13 @@ def draw_icon(cv, kind, cx, cy, r, circle_color, fg="#FFFFFF"):
         for i, dy in enumerate((-16, 0, 16)):
             off = 6 * k if i == 1 else 0
             cv.line([(cx - 26 * k + off, cy + dy * k), (cx + 26 * k - off, cy + dy * k)], fg, 6 * k)
+    elif kind == "contrast":
+        for x, up in ((cx - 13 * k, False), (cx + 13 * k, True)):
+            y0, y1 = (cy - 24 * k, cy + 24 * k)
+            cv.line([(x, y0), (x, y1)], fg, 6 * k)
+            tip = y0 if up else y1
+            d = 11 * k if up else -11 * k
+            cv.line([(x - 10 * k, tip + d), (x, tip), (x + 10 * k, tip + d)], fg, 6 * k)
     elif kind == "check":
         cv.line([(cx - 20 * k, cy + 2 * k), (cx - 6 * k, cy + 16 * k), (cx + 22 * k, cy - 14 * k)], fg, 8 * k)
     elif kind == "alert":
@@ -146,6 +153,8 @@ def draw_header(cv, cfg, x, y_center, date_label, scale=1.0, right_text=None, ri
     eyebrow = cfg.get("eyebrow", "PREVISIÓN")
     cv.text(tx, y_center - 28 * scale, f"{eyebrow} · {date_label}", 24 * scale, c["label"], bold=True)
     cv.text(tx, y_center + 14 * scale, cfg["title"], 50 * scale, c["text"], bold=True)
+    if cfg.get("subtitle"):
+        cv.text(tx, y_center + 66 * scale, cfg["subtitle"], 26 * scale, c["label"])
     if right_text:
         cv.text(right_x, y_center - 28 * scale, right_text, 24 * scale, c["label"], bold=True, anchor="rm")
 
@@ -175,7 +184,13 @@ def draw_podium(cv, cfg, top3, x0, x1, base_y, heights, sizes):
         h = heights[idx]
         top = base_y - h
         cv.rect(cx - colw / 2, top, cx + colw / 2, base_y, c["pillars"][idx], r=18, corners=(True, True, False, False))
-        cv.text(cx, top + h * 0.42, str(idx + 1), 84 if idx == 0 else 60, c["pillar_text"][idx], bold=True, anchor="mm")
+        detail = item.get("detail_short")
+        rank_y = top + h * (0.30 if detail else 0.42)
+        cv.text(cx, rank_y, str(idx + 1), 84 if idx == 0 else 60, c["pillar_text"][idx], bold=True, anchor="mm")
+        if detail:
+            dsize = 22 if h >= 200 else 19
+            for j, part in enumerate(detail.split(" · ")):
+                cv.text(cx, rank_y + (64 if idx == 0 else 50) + j * dsize * 1.35, part, dsize, c["pillar_text"][idx], bold=True, anchor="mm")
         vsize = sizes[0] if idx == 0 else sizes[1]
         vbase = top - 22
         draw_value(cv, cx, vbase, cfg, item["value"], vsize, c["accent"])
@@ -202,8 +217,16 @@ def draw_rows(cv, cfg, rows, start_rank, total, x0, x1, y0, row_h, gap, name_siz
         vw = cv.width(val, val_size, True)
         cv.text(x1 - 16, cy, val, val_size, c["accent"], bold=True, anchor="rm")
         rank_w = 26 + cv.width(str(total), name_size * 0.85, True) + 20
-        name = cv.fit(item["name"], name_size, (x1 - x0) - rank_w - vw - 40)
-        cv.text(x0 + rank_w, cy, name, name_size, c["text"])
+        maxw = (x1 - x0) - rank_w - vw - 40
+        if item.get("detail"):
+            nsize, dsize = name_size * 0.86, name_size * 0.62
+            name = cv.fit(item["name"], nsize, maxw)
+            cv.text(x0 + rank_w, cy - row_h * 0.19, name, nsize, c["text"])
+            det = item["detail"] if cv.width(item["detail"], dsize) <= maxw else item["detail_short"]
+            cv.text(x0 + rank_w, cy + row_h * 0.24, cv.fit(det, dsize, maxw), dsize, c["label"])
+        else:
+            name = cv.fit(item["name"], name_size, maxw)
+            cv.text(x0 + rank_w, cy, name, name_size, c["text"])
 
 
 def footer(cv, cfg, y, size=24):
