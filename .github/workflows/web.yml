@@ -3,9 +3,10 @@
 # porque solo acepta URL de un dominio verificado.
 name: Web
 
-# Se lanza a mano (o desde otros workflows). Cuando Pages esté activado se puede añadir
-#   push: {branches: [main], paths: ["docs/**"]}
 on:
+  push:
+    branches: [main]
+    paths: ["docs/**"]
   workflow_dispatch:
   workflow_call:
 
