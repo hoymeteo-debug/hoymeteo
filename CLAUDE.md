@@ -60,7 +60,7 @@ vídeo de demo. Sandbox «Pruebas» conectado a @hoymeteo (client key de Sandbox
 TikTok personal y en privado. **Al aprobarse:** 1) client key de Production en config y en el botón de
 `docs/tiktok/index.html`; 2) Víctor guarda el secret de Production en `TIKTOK_CLIENT_SECRET`;
 3) reconectar con código nuevo (`TikTok: conectar`); 4) integrar TikTok en `diario.yml` con
-`TIKTOK_AUTOPUBLISH = True` (carrusel por serie a su hora, `PUBLIC_TO_EVERYONE`); 5) Víctor pone la cuenta
+`TIKTOK_AUTOPUBLISH = True` (por serie a su hora, `PUBLIC_TO_EVERYONE`, **en vídeo**: la story animada con nuestra música; el carrusel de fotos lleva música automática de TikTok que no se puede elegir y a Víctor no le gustó); 5) Víctor pone la cuenta
 pública. Si la rechazan: valorar intermediario de pago (Ayrshare, Publer…), consultando antes.
 
 **TikTok preparado (10-nov-2026), pendiente de Víctor:** `tiktok.py` + `tiktok_cli.py`, web en
