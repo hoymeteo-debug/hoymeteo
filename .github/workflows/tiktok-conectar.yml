@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       code:
-        description: "Código de autorización (lo muestra la web al volver de TikTok)"
+        description: "Código de autorización (lo muestra la web al volver de TikTok). Escribe probar para comprobar solo las claves"
         required: true
 
 permissions:
@@ -28,6 +28,7 @@ jobs:
           CODE: ${{ inputs.code }}
         run: python tiktok_cli.py connect --code "$CODE"
       - name: Guardar la autorización cifrada
+        if: inputs.code != 'probar'
         run: |
           git config user.name "hoymeteo-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

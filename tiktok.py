@@ -54,7 +54,9 @@ class TikTok:
     def __init__(self, client_key: str, client_secret: str, redirect_uri: str, session=None, poll_seconds=5.0):
         if not client_key or not client_secret:
             raise TikTokError("Faltan TIKTOK_CLIENT_KEY / TIKTOK_CLIENT_SECRET")
-        self.client_key, self.client_secret, self.redirect_uri = client_key, client_secret, redirect_uri
+        # Al pegar claves es fácil arrastrar espacios o saltos de línea
+        self.client_key, self.client_secret = client_key.strip(), client_secret.strip()
+        self.redirect_uri = redirect_uri
         self.session = session or requests.Session()
         self.poll_seconds = poll_seconds
         self.access_token = None
@@ -74,6 +76,17 @@ class TikTok:
         self.access_token = body["access_token"]
         return {"refresh_token": body["refresh_token"], "open_id": body.get("open_id"),
                 "scope": body.get("scope"), "refreshed_at": int(time.time())}
+
+    def check_credentials(self):
+        """Comprueba que client key y secret casan (token de app, sin usuario)."""
+        r = self.session.post(f"{API}/oauth/token/", timeout=30,
+                              data={"client_key": self.client_key, "client_secret": self.client_secret,
+                                    "grant_type": "client_credentials"},
+                              headers={"Content-Type": "application/x-www-form-urlencoded"})
+        body = r.json() if r.content else {}
+        if "access_token" not in body:
+            raise TikTokError(f"Las claves no casan: {body.get('error')} {body.get('error_description', '')}")
+        return True
 
     def exchange_code(self, code: str):
         """Primera conexión: cambia el código de autorización por los tokens."""

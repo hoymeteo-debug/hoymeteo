@@ -53,6 +53,12 @@ def main():
         if args.command == "connect":
             if not args.code:
                 sys.exit("Falta --code")
+            print(f"Client key: {tk.client_key[:4]}… ({len(tk.client_key)} caracteres) · "
+                  f"client secret: {len(tk.client_secret)} caracteres")
+            if args.code.strip().lower() == "probar":
+                tk.check_credentials()
+                print("Las claves casan: TikTok acepta la client key y el client secret")
+                return
             save_state(tk.exchange_code(args.code), tk.client_secret)
             print("TikTok conectado. Autorización guardada cifrada en tiktok_state.enc")
             show_creator(tk)
