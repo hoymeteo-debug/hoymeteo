@@ -95,11 +95,11 @@ def cmd_check():
     print(f"Límite de publicación: {info.get('publishing_limit')}")
 
 
-def cmd_run(mode: str, target: date):
+def cmd_run(mode: str, target: date, only=None):
     base = os.environ.get("MEDIA_BASE_URL", "")
     if not base:
         sys.exit("Falta MEDIA_BASE_URL")
-    material = series_material(target)
+    material = [m for m in series_material(target) if not only or m[0] in only]
     if not material:
         sys.exit("No hay series para publicar hoy")
     ig = client()
@@ -147,6 +147,7 @@ def main():
     ap.add_argument("command", choices=["jpeg", "check", "run"])
     ap.add_argument("--mode", choices=["prepare", "publish"], default="prepare")
     ap.add_argument("--date", help="AAAA-MM-DD (por defecto, hoy en Madrid)")
+    ap.add_argument("--series", help="solo estas series, separadas por coma (p. ej. avisos)")
     args = ap.parse_args()
     target = date.fromisoformat(args.date) if args.date else today()
     try:
@@ -155,7 +156,7 @@ def main():
         elif args.command == "check":
             cmd_check()
         else:
-            cmd_run(args.mode, target)
+            cmd_run(args.mode, target, [k.strip() for k in args.series.split(',')] if args.series else None)
     except InstagramError as exc:
         sys.exit(f"ERROR de Instagram: {exc}")
 
