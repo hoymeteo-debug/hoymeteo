@@ -54,6 +54,15 @@ Cuando llegue la serie de nieve/esquí, decidir con Víctor si el contraste se m
 **compuesta por código** (`tools/make_music.py`, 8 pistas en `music/`, sin licencias de terceros), una
 distinta por serie y día. Si el vídeo falla al crearse o Instagram lo rechaza, se publica la imagen.
 
+**TikTok, estado (10-nov-2026):** app «HoyMeteo» (individual) enviada a revisión en Production con el
+vídeo de demo. Sandbox «Pruebas» conectado a @hoymeteo (client key de Sandbox en
+`config.TIKTOK_CLIENT_KEY`, secret de Sandbox en `TIKTOK_CLIENT_SECRET`); prueba privada OK. Cuenta de
+TikTok personal y en privado. **Al aprobarse:** 1) client key de Production en config y en el botón de
+`docs/tiktok/index.html`; 2) Víctor guarda el secret de Production en `TIKTOK_CLIENT_SECRET`;
+3) reconectar con código nuevo (`TikTok: conectar`); 4) integrar TikTok en `diario.yml` con
+`TIKTOK_AUTOPUBLISH = True` (carrusel por serie a su hora, `PUBLIC_TO_EVERYONE`); 5) Víctor pone la cuenta
+pública. Si la rechazan: valorar intermediario de pago (Ayrshare, Publer…), consultando antes.
+
 **TikTok preparado (10-nov-2026), pendiente de Víctor:** `tiktok.py` + `tiktok_cli.py`, web en
 `docs/` (privacidad, condiciones, página de retorno `/tiktok/` que muestra el código), workflows
 `web.yml` (Pages por Actions, incluye la rama `media` en `/media/`), `tiktok-conectar.yml` y
