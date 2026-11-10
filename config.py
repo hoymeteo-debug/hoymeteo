@@ -19,7 +19,7 @@ INSTAGRAM_AUTOPUBLISH = True  # aprobado por Víctor el 10-nov-2026
 INSTAGRAM_USER_ID = "17841475798213052"
 
 # TikTok: client key de la app (no es secreta; el secreto va en TIKTOK_CLIENT_SECRET).
-TIKTOK_CLIENT_KEY = ""
+TIKTOK_CLIENT_KEY = "sbaw6d4jvj09ewvqd5"  # Sandbox (pruebas). Cambiar por la de producción tras la aprobación
 # Publicar en TikTok cada mañana. Solo tiene sentido cuando TikTok apruebe la app (auditoría);
 # antes, todo lo publicado por la API sale privado.
 TIKTOK_AUTOPUBLISH = False
