@@ -65,13 +65,13 @@ def main():
                 sys.exit("Falta --code")
             yt.save(c.exchange_code(args.code), c.client_secret)
             print("YouTube conectado. Autorización guardada cifrada en youtube_state.enc")
-            print("Canal:", c.channel().get("title"))
+            print("Autorización válida (con el permiso de subida Google no deja leer el nombre del canal)")
             return
         old_state = yt.load(c.client_secret)
         state = c.refresh(old_state)
         if state != old_state:  # solo se reescribe si Google cambió el token
             yt.save(state, c.client_secret)
-        print("Canal:", c.channel().get("title"))
+        print("Acceso a YouTube renovado")
         if args.command == "check":
             return
         target = date.fromisoformat(args.date) if args.date else datetime.now(ZoneInfo(config.TIMEZONE)).date()
