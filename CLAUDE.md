@@ -21,7 +21,9 @@ series (`max`, `min`, `rain`, `wind`): carrusel 1080×1350 (podio + top 30), sto
 elaboración y además da valores más bajos que la oficial (Madrid: 16° horaria vs 18° diaria).
 Lluvia y rachas, de la horaria. Los 112 municipios de `municipios.csv` se resuelven. Una
 ejecución completa son 448 llamadas (~16 min reales; empezar a las 06:15 como tarde). Pruebas: `python -m pytest` (fixtures reales en
-`tests/fixtures/`). Pendiente: confirmar a qué hora sale la pasada de las 00 UTC.
+`tests/fixtures/`). Medido el 10-nov-2026: entre 06:16 y 07:00 (Madrid) AEMET seguía sirviendo la predicción elaborada
+la víspera a las 20:59; la de madrugada no llega antes de las 07:00. Se usa esa, es la última disponible
+(por eso el aviso «elaboradas otro día» es normal y no bloquea).
 
 **Instagram en marcha (10-nov-2026, aprobado por Víctor):** `instagram.py` + `publish.py`. Token de
 inicio de sesión unificado (usuario del sistema, empieza por EAA, no caduca) en el secreto

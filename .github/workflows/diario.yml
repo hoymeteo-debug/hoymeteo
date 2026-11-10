@@ -1,13 +1,14 @@
 # Ejecución diaria de @hoymeteo en GitHub Actions (gratis en repositorios públicos).
 #
-# El cron va en UTC y GitHub puede retrasarlo. Por eso se lanza pronto (03:47 UTC =
-# 04:47 en invierno / 05:47 en verano) y wait_until.py espera hasta las 06:15 de Madrid.
+# El cron va en UTC y GitHub puede retrasarlo (el 10-nov-2026 arrancó 48 min tarde). Por eso se
+# lanza muy pronto (02:47 UTC = 03:47 en invierno / 04:47 en verano) y wait_until.py espera
+# hasta las 06:15 de Madrid.
 # Si algo falla, GitHub envía un correo automáticamente al dueño del repositorio.
 name: Publicación diaria
 
 on:
   schedule:
-    - cron: "47 3 * * *"
+    - cron: "47 2 * * *"
   workflow_dispatch:        # botón "Run workflow" para lanzarlo a mano
     inputs:
       instagram:
@@ -97,7 +98,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add history/
           git diff --cached --quiet || git commit -m "Histórico $(date +%F)"
-          git push
+          # Si alguien ha subido cambios mientras tanto, se integran antes de subir
+          for i in 1 2 3; do git pull -q --rebase origin main && git push -q && break; sleep 5; done
 
       # Instagram descarga las imágenes desde una URL pública. Se suben a la rama "media",
       # que se reescribe cada día solo con las de hoy (las anteriores desaparecen).
