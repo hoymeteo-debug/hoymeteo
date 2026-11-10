@@ -47,6 +47,12 @@ la hora de ambas, de la horaria («↓14° a las 7 h · ↑28° a las 15 h»; si
 del medio). Las horas solo se muestran si la horaria trae el día completo (24 h); si no, «↓14° · ↑28°».
 Cuando llegue la serie de nieve/esquí, decidir con Víctor si el contraste se mueve a otra hora.
 
+**Stories en vídeo con música (10-nov-2026, aprobado por Víctor):** `video.py` anima cada `story.png`
+(12 s, 30 fps, H.264 + AAC) con los elementos que anota `render.py` en `story.json`: cabecera → podio
+(3.º, 2.º, 1.º) o tarjetas de avisos → filas en cascada → pie; curva ease-out sin rebotes. Música lo-fi
+**compuesta por código** (`tools/make_music.py`, 8 pistas en `music/`, sin licencias de terceros), una
+distinta por serie y día. Si el vídeo falla al crearse o Instagram lo rechaza, se publica la imagen.
+
 **TikTok preparado (10-nov-2026), pendiente de Víctor:** `tiktok.py` + `tiktok_cli.py`, web en
 `docs/` (privacidad, condiciones, página de retorno `/tiktok/` que muestra el código), workflows
 `web.yml` (Pages por Actions, incluye la rama `media` en `/media/`), `tiktok-conectar.yml` y

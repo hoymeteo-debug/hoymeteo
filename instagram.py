@@ -153,5 +153,11 @@ class Instagram:
         self.wait_ready(cid)
         return cid
 
+    def prepare_story_video(self, video_url):
+        """Story en vídeo (MP4 H.264 + AAC, 9:16). Instagram tarda más en procesarla."""
+        cid = self._container(video_url=video_url, media_type="STORIES")
+        self.wait_ready(cid, timeout=600)
+        return cid
+
     def publish(self, container_id):
         return self._call("POST", f"{self.resolve_user_id()}/media_publish", creation_id=container_id)["id"]

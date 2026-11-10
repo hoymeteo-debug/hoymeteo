@@ -91,10 +91,20 @@ def check_and_save(records, municipios, target):
         json.dumps(today, ensure_ascii=False, indent=1, sort_keys=True), encoding="utf-8")
 
 
+def make_story_video(out, target, key):
+    """Vídeo animado con música para la story. Si falla, se publica la imagen (no se para nada)."""
+    try:
+        import video
+        video.render_story_video(out / "story.png", out / "story.mp4", video.pick_track(target, key))
+    except Exception as exc:  # noqa: BLE001
+        print(f"  aviso: no se pudo crear el vídeo de la story ({type(exc).__name__}: {exc})")
+
+
 def clean_dir(out):
     """Borra imágenes de una ejecución anterior para no mezclar diapositivas."""
-    for old in Path(out).glob("*.png"):
-        old.unlink()
+    for pattern in ("*.png", "*.mp4", "*.json"):
+        for old in Path(out).glob(pattern):
+            old.unlink()
 
 
 def generate_avisos(target, date_label, out, demo=False, refresh=False):
@@ -111,6 +121,7 @@ def generate_avisos(target, date_label, out, demo=False, refresh=False):
     clean_dir(out)
     slides = render.render_avisos_carousel(cfg, lista, n, date_label, out)
     render.render_avisos_story(cfg, lista, n, date_label, out / "story.png")
+    make_story_video(out, target, "avisos")
     (out / "caption.txt").write_text(av.build_caption(lista, captions.fecha_larga(target)), encoding="utf-8")
     resumen = f"{len(lista)} avisos (rojos {n[3]}, naranjas {n[2]}, amarillos {n[1]})" if lista else "sin avisos"
     print(f"- {cfg['label']} ({cfg['post_time']}): {resumen} · {len(slides)} diapositivas + story + texto -> {out}")
@@ -165,6 +176,7 @@ def main():
             clean_dir(out)
             slides = render.render_carousel(cfg, ranking, date_label, out)
             render.render_story(cfg, ranking, date_label, out / "story.png")
+            make_story_video(out, target, key)
             (out / "caption.txt").write_text(captions.build_caption(cfg, ranking, target), encoding="utf-8")
             print(f"- {cfg['label']} ({cfg['post_time']}): {len(slides)} diapositivas + story + texto -> {out}")
             made += 1

@@ -2,3 +2,4 @@ Pillow>=10.1
 requests>=2.31
 tzdata>=2024.1
 cryptography>=42
+imageio-ffmpeg>=0.5

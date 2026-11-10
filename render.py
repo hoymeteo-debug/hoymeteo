@@ -32,8 +32,15 @@ def font(px, bold=False):
 class Canvas:
     def __init__(self, w, h, bg):
         self.w, self.h = w, h
+        self.bg = bg
         self.img = Image.new("RGB", (w * S, h * S), rgb(bg))
         self.d = ImageDraw.Draw(self.img)
+        self.boxes = []  # elementos para animar el vídeo: (tipo, orden, caja)
+
+    def mark(self, kind, x0, y0, x1, y1, order=0):
+        """Anota un elemento (en px finales) para animarlo luego en el vídeo de la story."""
+        self.boxes.append({"kind": kind, "order": order,
+                           "box": [max(0, int(x0)), max(0, int(y0)), min(self.w, int(x1 + 1)), min(self.h, int(y1 + 1))]})
 
     def rect(self, x0, y0, x1, y1, fill, r=0, corners=None):
         box = [x0 * S, y0 * S, x1 * S, y1 * S]
@@ -85,6 +92,11 @@ class Canvas:
     def save(self, path):
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         self.img.resize((self.w, self.h), Image.LANCZOS).save(path, optimize=True)
+
+    def save_layout(self, path):
+        """Guarda junto a la imagen la posición de cada elemento (para video.py)."""
+        import json
+        Path(path).write_text(json.dumps({"size": [self.w, self.h], "bg": self.bg, "elements": self.boxes}), encoding="utf-8")
 
 
 # --- Iconos dibujados con formas simples -------------------------------------------
@@ -155,6 +167,7 @@ def draw_header(cv, cfg, x, y_center, date_label, scale=1.0, right_text=None, ri
     cv.text(tx, y_center + 14 * scale, cfg["title"], 50 * scale, c["text"], bold=True)
     if cfg.get("subtitle"):
         cv.text(tx, y_center + 66 * scale, cfg["subtitle"], 26 * scale, c["label"])
+    cv.mark("header", 0, y_center - r - 6, cv.w, y_center + (90 if cfg.get("subtitle") else r + 6) * scale)
     if right_text:
         cv.text(right_x, y_center - 28 * scale, right_text, 24 * scale, c["label"], bold=True, anchor="rm")
 
@@ -176,6 +189,7 @@ def draw_podium(cv, cfg, top3, x0, x1, base_y, heights, sizes):
     colw = (x1 - x0 - 2 * gap) / 3
     order = [1, 0, 2]  # posiciones izquierda, centro, derecha
     cv.rect(x0, base_y, x1, base_y + 3, c["label"])
+    cv.mark("fade", x0, base_y, x1, base_y + 3, order=0)
     for slot, idx in enumerate(order):
         if idx >= len(top3):
             continue
@@ -199,6 +213,7 @@ def draw_podium(cv, cfg, top3, x0, x1, base_y, heights, sizes):
         ny = vbase - vsize - 16 - (len(lines) - 1) * nsize * 1.2
         for i, ln in enumerate(lines):
             cv.text(cx, ny + i * nsize * 1.2, ln, nsize, c["text"], bold=True, anchor="mm")
+        cv.mark("rise", cx - colw / 2, ny - nsize, cx + colw / 2, base_y, order=3 - idx)
 
 
 def draw_rows(cv, cfg, rows, start_rank, total, x0, x1, y0, row_h, gap, name_size, val_size):
@@ -209,6 +224,7 @@ def draw_rows(cv, cfg, rows, start_rank, total, x0, x1, y0, row_h, gap, name_siz
         y = y0 + i * (row_h + gap)
         t = (rank - 1) / max(total - 1, 1)
         cv.rect(x0, y, x1, y + row_h, row_bg)
+        cv.mark("row", x0, y, x1, y + row_h, order=rank)
         cv.rect(x0, y, x0 + 9, y + row_h, mix(c["strip_from"], c["strip_to"], t))
         cy = y + row_h / 2
         cv.text(x0 + 26, cy, str(rank), name_size * 0.85, c["label"], bold=True)
@@ -231,6 +247,7 @@ def draw_rows(cv, cfg, rows, start_rank, total, x0, x1, y0, row_h, gap, name_siz
 
 def footer(cv, cfg, y, size=24):
     cv.text(cv.w / 2, y, f"Fuente: AEMET · {config.HANDLE}", size, cfg["colors"]["label"], bold=True, anchor="mm")
+    cv.mark("footer", 0, y - size, cv.w, y + size)
 
 
 # --- Composiciones ----------------------------------------------------------------------
@@ -281,6 +298,7 @@ def render_story(cfg, ranking, date_label, out_path):
     draw_rows(cv, cfg, rows[left:], 4 + left, total, M + colw + gap, W - M, y0, row_h, rgap, 27, 28)
     footer(cv, cfg, 1700, size=28)
     cv.save(out_path)
+    cv.save_layout(Path(out_path).with_suffix(".json"))
     return out_path
 
 
@@ -304,6 +322,7 @@ def draw_level_tiles(cv, cfg, n_by_level, x0, x1, y0, h, num_size=72, label_size
         if n == 0:  # sin avisos de ese color: tarjeta apagada
             bg, fg = mix(cfg["colors"]["bg"], "#FFFFFF", 0.5), cfg["colors"]["label"]
         cv.rect(x, y0, x + w, y0 + h, bg, r=18)
+        cv.mark("pop", x, y0, x + w, y0 + h, order=i)
         cv.text(x + w / 2, y0 + h * 0.42, str(n), num_size, fg, bold=True, anchor="mm")
         cv.text(x + w / 2, y0 + h * 0.80, labels[lvl][0 if n == 1 else 1].upper(), label_size, fg, bold=True, anchor="mm")
 
@@ -315,6 +334,7 @@ def draw_aviso_rows(cv, cfg, rows, x0, x1, y0, row_h, gap, name_size, sub_size, 
         y = y0 + i * (row_h + gap)
         bg, fg, name = LEVEL_STYLE[a["level"]]
         cv.rect(x0, y, x1, y + row_h, row_bg, r=12)
+        cv.mark("row", x0, y, x1, y + row_h, order=i + 1)
         cv.rect(x0, y, x0 + chip_w, y + row_h, bg, r=12, corners=(True, False, False, True))
         cy = y + row_h / 2
         cv.text(x0 + chip_w / 2, cy, name, sub_size * 0.92, fg, bold=True, anchor="mm")
@@ -329,6 +349,8 @@ def draw_aviso_rows(cv, cfg, rows, x0, x1, y0, row_h, gap, name_size, sub_size, 
 
 
 def _no_avisos(cv, cfg, cy, size):
+    cv.mark("pop", cv.w / 2 - size, cy - size, cv.w / 2 + size, cy + size)
+    cv.mark("row", 0, cy + size + 40, cv.w, cy + size + 175, order=1)
     draw_icon(cv, "check", cv.w / 2, cy, size, "#2E7D32")
     cv.text(cv.w / 2, cy + size + 80, "Hoy no hay avisos", 64, cfg["colors"]["text"], bold=True, anchor="mm")
     cv.text(cv.w / 2, cy + size + 150, "meteorológicos en España", 40, cfg["colors"]["label"], anchor="mm")
@@ -392,6 +414,8 @@ def render_avisos_story(cfg, avisos, n_by_level, date_label, out_path):
         draw_aviso_rows(cv, cfg, avisos[:max_rows], M, W - M, 580, 74, 8, 28, 21, chip_w=136)
         if len(avisos) > max_rows:
             cv.text(W / 2, 1615, f"y {len(avisos) - max_rows} avisos más", 30, cfg["colors"]["label"], bold=True, anchor="mm")
+            cv.mark("footer", 0, 1590, W, 1640)
     footer(cv, cfg, 1700, size=28)
     cv.save(out_path)
+    cv.save_layout(Path(out_path).with_suffix(".json"))
     return out_path

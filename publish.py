@@ -41,6 +41,9 @@ def export_jpeg(target: date):
         dst.parent.mkdir(parents=True, exist_ok=True)
         Image.open(png).convert("RGB").save(dst, "JPEG", quality=92, optimize=True, progressive=False)
         count += 1
+    import shutil
+    for mp4 in src_root.glob("*/story.mp4"):  # stories en vídeo
+        shutil.copyfile(mp4, MEDIA_DIR / target.isoformat() / mp4.parent.name / "story.mp4")
     for caption in src_root.glob("*/caption.txt"):  # TikTok lo lee desde aquí
         (MEDIA_DIR / target.isoformat() / caption.parent.name / "caption.txt").write_text(
             caption.read_text(encoding="utf-8"), encoding="utf-8")
@@ -95,6 +98,17 @@ def cmd_check():
     print(f"Límite de publicación: {info.get('publishing_limit')}")
 
 
+def prepare_story(ig, base, target, key, story_jpg):
+    """Story en vídeo (animada y con música); si Instagram la rechaza, la imagen de siempre."""
+    mp4 = story_jpg.with_suffix(".mp4")
+    if mp4.exists():
+        try:
+            return ig.prepare_story_video(public_url(base, target, key, mp4))
+        except InstagramError as exc:
+            print(f"  aviso: story en vídeo rechazada ({exc}); se publica la imagen")
+    return ig.prepare_story(public_url(base, target, key, story_jpg))
+
+
 def cmd_run(mode: str, target: date, only=None):
     base = os.environ.get("MEDIA_BASE_URL", "")
     if not base:
@@ -111,7 +125,7 @@ def cmd_run(mode: str, target: date, only=None):
         try:
             urls = [public_url(base, target, key, s) for s in slides]
             carousel = ig.prepare_carousel(urls, caption) if len(urls) > 1 else ig.prepare_image(urls[0], caption)
-            story_id = ig.prepare_story(public_url(base, target, key, story)) if story else None
+            story_id = prepare_story(ig, base, target, key, story) if story else None
             prepared.append((key, cfg, carousel, story_id))
             print(f"- {cfg['label']}: " + (f"carrusel de {len(slides)}" if len(slides) > 1 else "imagen") + " lista" + (" + story lista" if story_id else ""))
         except InstagramError as exc:
