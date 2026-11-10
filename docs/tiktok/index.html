@@ -9,7 +9,11 @@
 <body><main>
 <p class="eyebrow"><a href="../">HoyMeteo</a></p>
 <h1 id="title">Conectar TikTok</h1>
-<div class="card" id="box"><p>Esta página recibe la autorización de TikTok.</p></div>
+<div class="card" id="box">
+  <p>Conecta la cuenta de TikTok de @hoymeteo para que HoyMeteo publique cada mañana el carrusel del tiempo.</p>
+  <p>HoyMeteo solo usa tu nombre de cuenta y publica el contenido meteorológico en tu perfil. Puedes retirar el permiso cuando quieras desde TikTok.</p>
+  <p><a href="https://www.tiktok.com/v2/auth/authorize/?client_key=sbaw6d4jvj09ewvqd5&amp;scope=user.info.basic%2Cvideo.publish&amp;response_type=code&amp;redirect_uri=https%3A%2F%2Fhoymeteo-debug.github.io%2Fhoymeteo%2Ftiktok%2F&amp;state=hoymeteo"><button type="button">Conectar con TikTok</button></a></p>
+</div>
 <script>
   // TikTok vuelve aquí con ?code=… tras autorizar. El código solo vale unos minutos y una vez,
   // y sin el secreto de la app no sirve para nada, así que mostrarlo no es un riesgo.
