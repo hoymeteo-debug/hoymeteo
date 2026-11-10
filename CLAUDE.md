@@ -23,6 +23,14 @@ Lluvia y rachas, de la horaria. Los 112 municipios de `municipios.csv` se resuel
 ejecución completa son 448 llamadas (~16 min reales; empezar a las 06:15 como tarde). Pruebas: `python -m pytest` (fixtures reales en
 `tests/fixtures/`). Pendiente: confirmar a qué hora sale la pasada de las 00 UTC.
 
+**Instagram en marcha (10-nov-2026, aprobado por Víctor):** `instagram.py` + `publish.py`. Token de
+inicio de sesión unificado (usuario del sistema, empieza por EAA, no caduca) en el secreto
+`IG_ACCESS_TOKEN`; ese token no deja averiguar la cuenta, así que su id va en
+`config.INSTAGRAM_USER_ID`. Las JPEG se suben cada día a la rama `media` (se reescribe, las
+antiguas desaparecen) y se sirven por raw.githubusercontent.com. `INSTAGRAM_AUTOPUBLISH = True`:
+la ejecución diaria publica carrusel + story de cada serie a su hora. A mano: botón
+"Run workflow" con modo nada / comprobar / preparar / publicar.
+
 Archivos: `run.py` (CLI), `config.py` (series, colores, textos), `aemet_client.py` (cliente y
 parser), `data_sources.py` (datos reales/demo y rankings), `render.py` (Pillow), `captions.py`,
 `municipios.csv` (≈110 municipios, código INE de provincia), `README.md`.

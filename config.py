@@ -12,7 +12,7 @@ MIN_COVERAGE = 0.9  # si faltan más del 10 % de municipios, no se publica
 # Publicación automática en Instagram cada mañana. Mientras sea False, la ejecución diaria
 # solo PREPARA las publicaciones (comprueba que todo funciona) pero no publica nada.
 # Se activa cuando Víctor apruebe la primera publicación real.
-INSTAGRAM_AUTOPUBLISH = False
+INSTAGRAM_AUTOPUBLISH = True  # aprobado por Víctor el 10-nov-2026
 
 # Id de la cuenta de Instagram @hoymeteo (no es secreto). El token de inicio de sesión
 # unificado no permite averiguarlo, así que se fija aquí. El secreto IG_USER_ID lo sustituye.

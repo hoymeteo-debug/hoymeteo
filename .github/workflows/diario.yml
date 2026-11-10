@@ -26,7 +26,7 @@ permissions:
 jobs:
   generar:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 240
     env:
       TZ: Europe/Madrid
       MEDIA_BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/media
