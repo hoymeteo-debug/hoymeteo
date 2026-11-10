@@ -74,7 +74,7 @@ def wait_until(hhmm: str):
 
 # --- Comandos ------------------------------------------------------------------------
 def client():
-    return Instagram(os.environ.get("IG_ACCESS_TOKEN", ""), os.environ.get("IG_USER_ID", ""))
+    return Instagram(os.environ.get("IG_ACCESS_TOKEN", ""), os.environ.get("IG_USER_ID") or config.INSTAGRAM_USER_ID)
 
 
 def cmd_check():

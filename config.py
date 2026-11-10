@@ -14,6 +14,10 @@ MIN_COVERAGE = 0.9  # si faltan más del 10 % de municipios, no se publica
 # Se activa cuando Víctor apruebe la primera publicación real.
 INSTAGRAM_AUTOPUBLISH = False
 
+# Id de la cuenta de Instagram @hoymeteo (no es secreto). El token de inicio de sesión
+# unificado no permite averiguarlo, así que se fija aquí. El secreto IG_USER_ID lo sustituye.
+INSTAGRAM_USER_ID = "17841475798213052"
+
 HANDLE = "@hoymeteo"
 TIMEZONE = "Europe/Madrid"
 TOP_N = 30  # puestos del ranking
