@@ -10,7 +10,7 @@ on:
         description: "Serie a publicar"
         type: choice
         default: max
-        options: [max, min, rain, wind]
+        options: [max, min, rain, wind, contrast, avisos]
       tipo:
         description: "Formato"
         type: choice
