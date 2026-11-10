@@ -2,7 +2,8 @@
 
 Cuentas de Instagram y TikTok `@hoymeteo` que publican cada mañana (07:00–07:30) el tiempo
 de hoy en España en forma de rankings. Dueño: Víctor. Idioma de trabajo: español, tuteo,
-directo y sin preámbulos. Código modular, documentado y listo para producción.
+directo y sin preámbulos. **Todas las respuestas a Víctor, siempre en castellano: nunca en inglés,
+ni siquiera un párrafo** (lo ha pedido varias veces). Código modular, documentado y listo para producción.
 
 **Objetivo final: cero trabajo diario para Víctor.** Datos, imágenes, textos, publicación en
 Instagram y TikTok y programación, todo automático. Víctor solo hace la configuración inicial y
