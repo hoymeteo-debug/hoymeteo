@@ -20,7 +20,11 @@ class InstagramError(Exception):
 
 
 class Instagram:
-    def __init__(self, token: str, ig_user_id: str = "", session=None, poll_seconds: float = 3.0):
+    # Límites de Meta: «Application request limit reached» y similares
+    RATE_LIMIT_CODES = (4, 17, 32, 613)
+
+    def __init__(self, token: str, ig_user_id: str = "", session=None, poll_seconds: float = 15.0,
+                 rate_wait: float = 90.0):
         if not token:
             raise InstagramError("Falta IG_ACCESS_TOKEN (secreto del repositorio)")
         self.token = token.strip()
@@ -28,13 +32,16 @@ class Instagram:
         self.base = f"https://{host}/{GRAPH_VERSION}"
         self.session = session or requests.Session()
         self.poll_seconds = poll_seconds
+        self.rate_wait = rate_wait
+        self.calls = 0  # llamadas hechas (Meta limita las llamadas por hora)
         self.user_id = ig_user_id.strip()
 
     # --- HTTP -----------------------------------------------------------------
     def _call(self, method, path, **params):
         params["access_token"] = self.token
         url = path if path.startswith("http") else f"{self.base}/{path.lstrip('/')}"
-        for attempt in range(1, 4):
+        for attempt in range(1, 6):
+            self.calls += 1
             try:
                 r = self.session.request(method, url, params=params if method == "GET" else None,
                                          data=params if method == "POST" else None, timeout=60)
@@ -49,6 +56,10 @@ class Instagram:
                 body = {}
             if r.status_code >= 500 and attempt < 3:
                 time.sleep(5 * attempt)
+                continue
+            if body.get("error", {}).get("code") in self.RATE_LIMIT_CODES and attempt < 5:
+                # Se ha agotado el cupo de llamadas: esperar y reintentar (90 s, 180 s, 270 s, 360 s)
+                time.sleep(self.rate_wait * attempt)
                 continue
             if r.status_code != 200 or "error" in body:
                 err = body.get("error", {})
@@ -120,7 +131,10 @@ class Instagram:
         return self._call("POST", f"{self.resolve_user_id()}/media", **params)["id"]
 
     def wait_ready(self, container_id, timeout=300):
+        """Espera a que Instagram termine de procesar. Pregunta cada vez más espaciado
+        (15 s, 22 s, 34 s… hasta 60 s) para no agotar el cupo de llamadas de Meta."""
         deadline = time.time() + timeout
+        interval = self.poll_seconds
         while True:
             status = self._call("GET", container_id, fields="status_code,status").get("status_code")
             if status == "FINISHED":
@@ -130,15 +144,21 @@ class Instagram:
                                      "¿Instagram no pudo descargar la imagen?")
             if time.time() > deadline:
                 raise InstagramError(f"El contenedor {container_id} no está listo tras {timeout} s")
-            time.sleep(self.poll_seconds)
+            time.sleep(interval)
+            interval = min(interval * 1.5, 60)
 
     def prepare_carousel(self, image_urls, caption):
         if not 2 <= len(image_urls) <= 10:
             raise InstagramError(f"Un carrusel necesita de 2 a 10 imágenes (hay {len(image_urls)})")
         children = [self._container(image_url=u, is_carousel_item="true") for u in image_urls]
-        for c in children:
-            self.wait_ready(c)
-        parent = self._container(media_type="CAROUSEL", children=",".join(children), caption=caption)
+        # Las imágenes suelen estar listas al momento: se intenta crear el carrusel directamente
+        # y solo si Instagram aún no las tiene se espera a cada una (ahorra muchas llamadas).
+        try:
+            parent = self._container(media_type="CAROUSEL", children=",".join(children), caption=caption)
+        except InstagramError:
+            for c in children:
+                self.wait_ready(c)
+            parent = self._container(media_type="CAROUSEL", children=",".join(children), caption=caption)
         self.wait_ready(parent)
         return parent
 

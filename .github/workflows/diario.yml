@@ -137,7 +137,7 @@ jobs:
 
       # Short diario de YouTube (todas las series en un vídeo), justo después de Instagram
       - name: YouTube (Short del día)
-        if: steps.modo.outputs.instagram == 'publicar'
+        if: always() && steps.modo.outputs.instagram == 'publicar'
         env:
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
         run: |

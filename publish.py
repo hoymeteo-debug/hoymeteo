@@ -155,6 +155,7 @@ def cmd_run(mode: str, target: date, only=None):
     gen_errors = config.OUTPUT_DIR / target.isoformat() / "ERRORES.txt"
     if gen_errors.exists():
         failures += [f"generación: {l}" for l in gen_errors.read_text(encoding="utf-8").splitlines() if l]
+    print(f"Llamadas a Instagram en esta ejecución: {ig.calls}")
     if failures:
         sys.exit("Fallos:\n  " + "\n  ".join(failures))
 

@@ -34,7 +34,7 @@ class FakeSession:
 
 
 def ig(session):
-    return Instagram("EAAtoken", "1789", session=session, poll_seconds=0)
+    return Instagram("EAAtoken", "1789", session=session, poll_seconds=0, rate_wait=0)
 
 
 def test_host_segun_token():
@@ -50,6 +50,8 @@ def test_carrusel_y_publicacion():
     posts = [c for c in s.calls if c[0] == "POST"]
     assert posts[0][2] == {"image_url": "https://x/1.jpg", "is_carousel_item": "true"}
     assert posts[2][2] == {"media_type": "CAROUSEL", "children": "c1,c2", "caption": "texto"}
+    # el carrusel se crea sin consultar antes cada imagen
+    assert not [c for c in s.calls if c[0] == "GET" and c[1] in ("c1", "c2")]
     assert client.publish(parent) == "post1"
 
 
@@ -73,3 +75,23 @@ def test_error_de_api_no_muestra_el_token():
     with pytest.raises(InstagramError) as exc:
         ig(FakeSession())._call("GET", "otra/cosa")
     assert "EAAtoken" not in str(exc.value)
+
+
+class LimitedSession(FakeSession):
+    """Devuelve «Application request limit reached» las dos primeras veces que se publica."""
+
+    def __init__(self):
+        super().__init__()
+        self.limited = 2
+
+    def request(self, method, url, params=None, data=None, timeout=None):
+        if url.endswith("/media_publish") and self.limited:
+            self.limited -= 1
+            return FakeResponse({"error": {"message": "Application request limit reached", "code": 4}}, 403)
+        return super().request(method, url, params, data, timeout)
+
+
+def test_reintenta_si_se_agota_el_cupo():
+    client = ig(LimitedSession())
+    assert client.publish("c9") == "post1"
+    assert client.calls == 3
