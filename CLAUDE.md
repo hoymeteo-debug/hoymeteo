@@ -34,6 +34,11 @@ antiguas desaparecen) y se sirven por raw.githubusercontent.com. `INSTAGRAM_AUTO
 la ejecución diaria publica carrusel + story de cada serie a su hora. A mano: botón
 "Run workflow" con modo nada / comprobar / preparar / publicar.
 
+**Falso error de Meta (11-nov-2026):** `media_publish` respondió «Fatal» (code -1, subcódigo 2207085)
+*aunque la publicación sí salía*; los reintentos crearon 13 duplicados. `Instagram.publish` ya no reintenta a
+ciegas: tras un error mira el contenedor y PUBLISHED = hecho. Comprobar siempre con
+`Instagram: diagnóstico` → modo `listar` antes de volver a publicar nada.
+
 **Serie de avisos hecha (10-nov-2026):** `avisos.py` descarga `avisos_cap/ultimoelaborado/area/esp`
 (tar de XML CAP), descarta verdes y cancelaciones, filtra los vigentes hoy en hora de Madrid y agrupa
 por zona + fenómeno (nivel más alto y solo las cifras de ese nivel). Provincia = dígitos 3-4 del código
