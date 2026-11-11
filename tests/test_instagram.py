@@ -77,6 +77,39 @@ def test_error_de_api_no_muestra_el_token():
     assert "EAAtoken" not in str(exc.value)
 
 
+class FalseFatalSession(FakeSession):
+    """media_publish responde «Fatal» pero la publicación sale (lo que pasó el 11-nov-2026)."""
+
+    def __init__(self, really_published=True):
+        super().__init__()
+        self.published = []
+        self.really = really_published
+
+    def request(self, method, url, params=None, data=None, timeout=None):
+        if url.endswith("/media_publish"):
+            self.calls.append(("POST", "media_publish", {}))
+            if self.really:
+                self.published.append(data["creation_id"])
+            return FakeResponse({"error": {"message": "Fatal", "code": -1, "error_subcode": 2207085}}, 400)
+        if method == "GET" and url.split("/v23.0/")[1].startswith("c"):
+            self.calls.append(("GET", "status", {}))
+            return FakeResponse({"status_code": "PUBLISHED" if self.published else "FINISHED"})
+        return super().request(method, url, params, data, timeout)
+
+
+def test_falso_fatal_no_duplica():
+    s = FalseFatalSession()
+    assert ig(s).publish("c7") == "c7"
+    assert s.published == ["c7"]  # una sola publicación
+
+
+def test_fatal_de_verdad_falla_sin_reintentar():
+    s = FalseFatalSession(really_published=False)
+    with pytest.raises(InstagramError):
+        ig(s).publish("c7")
+    assert sum(1 for c in s.calls if c[1] == "media_publish") == 1
+
+
 class LimitedSession(FakeSession):
     """Devuelve «Application request limit reached» las dos primeras veces que se publica."""
 
@@ -94,4 +127,5 @@ class LimitedSession(FakeSession):
 def test_reintenta_si_se_agota_el_cupo():
     client = ig(LimitedSession())
     assert client.publish("c9") == "post1"
-    assert client.calls == 3
+    # 3 intentos de publicar + 3 consultas de estado tras cada uno de los 2 errores
+    assert client.calls == 9

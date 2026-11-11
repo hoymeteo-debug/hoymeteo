@@ -16,7 +16,9 @@ GRAPH_VERSION = "v23.0"
 
 
 class InstagramError(Exception):
-    pass
+    def __init__(self, message, code=None):
+        super().__init__(message)
+        self.code = code  # código de error de Meta, si lo hay
 
 
 class Instagram:
@@ -37,13 +39,15 @@ class Instagram:
         self.user_id = ig_user_id.strip()
 
     # --- HTTP -----------------------------------------------------------------
-    def _call(self, method, path, **params):
+    def _call(self, method, path, once=False, **params):
+        """Llamada a la API con reintentos. `once=True`: sin reintentos (para media_publish,
+        que no se puede repetir a ciegas porque podría duplicar la publicación)."""
         params["access_token"] = self.token
         url = path if path.startswith("http") else f"{self.base}/{path.lstrip('/')}"
         for attempt in range(1, 6):
             self.calls += 1
             try:
-                r = self.session.request(method, url, params=params if method == "GET" else None,
+                r = self.session.request(method, url, params=params if method != "POST" else None,
                                          data=params if method == "POST" else None, timeout=60)
             except requests.RequestException as exc:
                 if attempt == 3:
@@ -54,11 +58,11 @@ class Instagram:
                 body = r.json()
             except ValueError:
                 body = {}
-            if r.status_code >= 500 and attempt < 3:
+            if r.status_code >= 500 and attempt < 3 and not once:
                 time.sleep(5 * attempt)
                 continue
             err_code = body.get("error", {}).get("code") if isinstance(body, dict) else None
-            if err_code in self.RATE_LIMIT_CODES and attempt < 5:
+            if err_code in self.RATE_LIMIT_CODES and attempt < 5 and not once:
                 # Se ha agotado el cupo de llamadas: esperar y reintentar (90 s, 180 s, 270 s, 360 s)
                 time.sleep(self.rate_wait * attempt)
                 continue
@@ -68,7 +72,7 @@ class Instagram:
                 raise InstagramError(
                     f"HTTP {r.status_code} en {path.split('?')[0]}: {err.get('message', r.text[:200])}"
                     f" (code {err.get('code')}, subcode {err.get('error_subcode')})"
-                    + (f" — {detail}" if detail else ""))
+                    + (f" — {detail}" if detail else ""), code=err.get("code"))
             return body
         raise InstagramError(f"Demasiados reintentos en {path}")
 
@@ -181,4 +185,36 @@ class Instagram:
         return cid
 
     def publish(self, container_id):
-        return self._call("POST", f"{self.resolve_user_id()}/media_publish", creation_id=container_id)["id"]
+        """Publica un contenedor sin duplicar nunca.
+
+        Meta a veces responde con error aunque la publicación SÍ ha salido (11-nov-2026: «Fatal»,
+        subcódigo 2207085, y cada «reintento» creó un duplicado). Así que tras cualquier error se
+        mira el contenedor: PUBLISHED = hecho. Solo se vuelve a intentar si sigue sin publicar
+        (FINISHED) y el error fue de cupo de llamadas."""
+        last = None
+        for attempt in range(1, 5):
+            try:
+                return self._call("POST", f"{self.resolve_user_id()}/media_publish", once=True,
+                                  creation_id=container_id)["id"]
+            except InstagramError as exc:
+                last = exc
+            status = self._status_after_error(container_id)
+            if status == "PUBLISHED":
+                return container_id  # publicado (Meta no devuelve el id de la publicación)
+            if status != "FINISHED" or last.code not in self.RATE_LIMIT_CODES:
+                raise last
+            time.sleep(self.rate_wait * attempt)
+        raise last
+
+    def _status_after_error(self, container_id):
+        """Estado del contenedor tras un error al publicar (Meta tarda unos segundos en marcarlo)."""
+        status = None
+        for wait in (10, 30, 60):
+            time.sleep(wait * (self.poll_seconds > 0))
+            try:
+                status = self._call("GET", container_id, fields="status_code").get("status_code")
+            except InstagramError:
+                continue
+            if status == "PUBLISHED":
+                break
+        return status

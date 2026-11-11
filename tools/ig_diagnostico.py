@@ -31,9 +31,18 @@ if mode == "listar":  # últimas publicaciones del feed y stories activas (no pu
         print("story", m.get("timestamp"), m.get("media_type"))
     print("Límite:", ig._call("GET", f"{uid}/content_publishing_limit", fields="config,quota_usage"))
     sys.exit(0)
+if mode == "borrar":  # borra las publicaciones cuyos ids van en IDS (separados por coma)
+    for mid in [x.strip() for x in os.environ.get("IDS", "").split(",") if x.strip()]:
+        try:
+            print("borrado", mid, ig._call("DELETE", mid))
+        except InstagramError as exc:
+            print("NO borrado", mid, exc)
+    sys.exit(0)
 try:
     if mode == "story":
         cid = ig.prepare_story(f"{base}/story.jpg")
+    elif mode == "story-video":
+        cid = ig.prepare_story_video(f"{base}/story.mp4")
     elif mode == "imagen":  # una sola imagen en el feed (sin carrusel)
         cid = ig.prepare_image(f"{base}/slide_1.jpg", "Prueba")
     else:
