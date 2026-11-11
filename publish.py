@@ -102,9 +102,10 @@ def cmd_check():
 
 
 def prepare_story(ig, base, target, key, story_jpg):
-    """Story en vídeo (animada y con música); si Instagram la rechaza, la imagen de siempre."""
+    """Story en vídeo (animada y con música); si Instagram la rechaza, la imagen de siempre.
+    Con STORY_IMAGEN=1 se usa siempre la imagen (diagnóstico)."""
     mp4 = story_jpg.with_suffix(".mp4")
-    if mp4.exists():
+    if mp4.exists() and os.environ.get("STORY_IMAGEN") != "1":
         try:
             return ig.prepare_story_video(public_url(base, target, key, mp4))
         except InstagramError as exc:

@@ -9,6 +9,11 @@ on:
         description: "Series separadas por coma: max, min, rain, wind, avisos"
         required: true
         default: avisos
+      story:
+        description: "Formato de la story"
+        type: choice
+        default: video
+        options: [video, imagen]
 
 concurrency:
   group: diario
@@ -64,4 +69,5 @@ jobs:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           SERIES: ${{ inputs.series }}
+          STORY_IMAGEN: ${{ inputs.story == 'imagen' && '1' || '0' }}
         run: python publish.py run --mode publish --series "$SERIES"
