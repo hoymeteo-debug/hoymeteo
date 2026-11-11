@@ -1,0 +1,26 @@
+# Diagnóstico: publica solo la story (imagen) de una serie de hoy, usando las imágenes ya subidas.
+name: "Instagram: diagnóstico"
+
+on:
+  workflow_dispatch:
+    inputs:
+      serie:
+        description: "Serie"
+        default: avisos
+
+jobs:
+  probar:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Europe/Madrid
+      MEDIA_BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/media
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: python tools/ig_diagnostico.py "${{ inputs.serie }}"
