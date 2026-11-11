@@ -1,0 +1,67 @@
+# Publica SOLO las stories de hoy con el material ya generado por la ejecución diaria
+# (no vuelve a pedir datos a AEMET ni publica carruseles).
+name: "Instagram: stories ahora"
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Id de la ejecución diaria cuyo material se usa"
+        required: true
+      series:
+        description: "Series separadas por coma"
+        default: max,min,rain,wind,contrast
+
+concurrency:
+  group: diario
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  stories:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      TZ: Europe/Madrid
+      MEDIA_BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/media
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: hoymeteo-${{ inputs.run_id }}
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ github.token }}
+          path: output/
+      - name: Subir el material
+        run: |
+          python publish.py jpeg
+          cd media
+          git init -q -b media
+          git config user.name "hoymeteo-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -qm "Material $(date +%F) (stories ahora)"
+          git push -fq "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" media
+          first=$(find . -name 'story.jpg' | head -1 | sed 's|^\./||')
+          for i in 1 2 3 4 5 6; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$MEDIA_BASE_URL/$first")
+            [ "$code" = 200 ] && break
+            sleep 10
+          done
+          [ "$code" = 200 ]
+      - name: Publicar las stories
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          SERIES: ${{ inputs.series }}
+        run: |
+          for s in ${SERIES//,/ }; do
+            python tools/ig_diagnostico.py "$s" story-video || python tools/ig_diagnostico.py "$s" story
+          done
