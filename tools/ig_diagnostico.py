@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Diagnóstico de Instagram: publica solo la story (imagen) de una serie del día.
+"""Diagnóstico de Instagram: publica una pieza suelta de una serie del día.
+
+Modos: story, imagen (una foto en el feed), carrusel, carrusel-sin-texto.
 
   python tools/ig_diagnostico.py avisos
 """
@@ -23,6 +25,8 @@ ig = Instagram(os.environ["IG_ACCESS_TOKEN"], os.environ.get("IG_USER_ID") or co
 try:
     if mode == "story":
         cid = ig.prepare_story(f"{base}/story.jpg")
+    elif mode == "imagen":  # una sola imagen en el feed (sin carrusel)
+        cid = ig.prepare_image(f"{base}/slide_1.jpg", "Prueba")
     else:
         caption = urllib.request.urlopen(f"{base}/caption.txt").read().decode("utf-8")
         slides, n = [], 1
