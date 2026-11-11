@@ -8,7 +8,7 @@ on:
         description: "Serie"
         default: avisos
       modo:
-        description: "story, imagen, carrusel o carrusel-sin-texto"
+        description: "listar, story, imagen, carrusel o carrusel-sin-texto"
         default: story
 
 jobs:

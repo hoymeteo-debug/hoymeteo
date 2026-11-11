@@ -22,6 +22,14 @@ mode = sys.argv[2] if len(sys.argv) > 2 else "story"
 d = datetime.now(ZoneInfo(config.TIMEZONE)).date().isoformat()
 base = f"{os.environ['MEDIA_BASE_URL'].rstrip('/')}/{d}/{key}"
 ig = Instagram(os.environ["IG_ACCESS_TOKEN"], os.environ.get("IG_USER_ID") or config.INSTAGRAM_USER_ID)
+if mode == "listar":  # últimas publicaciones del feed y stories activas (no publica nada)
+    uid = ig.resolve_user_id()
+    for m in ig._call("GET", f"{uid}/media", fields="timestamp,media_type,media_product_type", limit=12)["data"]:
+        print("feed ", m.get("timestamp"), m.get("media_type"), m.get("media_product_type"))
+    for m in ig._call("GET", f"{uid}/stories", fields="timestamp,media_type")["data"]:
+        print("story", m.get("timestamp"), m.get("media_type"))
+    print("Límite:", ig._call("GET", f"{uid}/content_publishing_limit", fields="config,quota_usage"))
+    sys.exit(0)
 try:
     if mode == "story":
         cid = ig.prepare_story(f"{base}/story.jpg")
