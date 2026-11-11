@@ -1,0 +1,734 @@
+{
+ "A Coruña": {
+  "gust_kmh": 30.0,
+  "rain_mm": 2.2,
+  "tmax": 18.0,
+  "tmin": 14.0
+ },
+ "Adeje": {
+  "gust_kmh": 34.0,
+  "rain_mm": 6.1,
+  "tmax": 26.0,
+  "tmin": 21.0
+ },
+ "Albacete": {
+  "gust_kmh": 80.0,
+  "rain_mm": 7.6,
+  "tmax": 19.0,
+  "tmin": 11.0
+ },
+ "Albarracín": {
+  "gust_kmh": 43.0,
+  "rain_mm": 12.4,
+  "tmax": 14.0,
+  "tmin": 9.0
+ },
+ "Alcalá de Henares": {
+  "gust_kmh": 61.0,
+  "rain_mm": 26.6,
+  "tmax": 17.0,
+  "tmin": 13.0
+ },
+ "Algeciras": {
+  "gust_kmh": 90.0,
+  "rain_mm": 24.0,
+  "tmax": 22.0,
+  "tmin": 17.0
+ },
+ "Alicante": {
+  "gust_kmh": 27.0,
+  "rain_mm": 3.1,
+  "tmax": 24.0,
+  "tmin": 17.0
+ },
+ "Almería": {
+  "gust_kmh": 32.0,
+  "rain_mm": 17.7,
+  "tmax": 24.0,
+  "tmin": 18.0
+ },
+ "Alp": {
+  "gust_kmh": 29.0,
+  "rain_mm": 3.6,
+  "tmax": 18.0,
+  "tmin": 8.0
+ },
+ "Andújar": {
+  "gust_kmh": 71.0,
+  "rain_mm": 16.4,
+  "tmax": 21.0,
+  "tmin": 14.0
+ },
+ "Aranda de Duero": {
+  "gust_kmh": 33.0,
+  "rain_mm": 13.2,
+  "tmax": 18.0,
+  "tmin": 8.0
+ },
+ "Aranjuez": {
+  "gust_kmh": 65.0,
+  "rain_mm": 24.8,
+  "tmax": 18.0,
+  "tmin": 13.0
+ },
+ "Arrecife": {
+  "gust_kmh": 61.0,
+  "rain_mm": 0.8,
+  "tmax": 29.0,
+  "tmin": 21.0
+ },
+ "Astorga": {
+  "gust_kmh": 33.0,
+  "rain_mm": 15.4,
+  "tmax": 14.0,
+  "tmin": 9.0
+ },
+ "Avilés": {
+  "gust_kmh": 20.0,
+  "rain_mm": 5.9,
+  "tmax": 21.0,
+  "tmin": 12.0
+ },
+ "Ayamonte": {
+  "gust_kmh": 94.0,
+  "rain_mm": 35.8,
+  "tmax": 23.0,
+  "tmin": 16.0
+ },
+ "Badajoz": {
+  "gust_kmh": 61.0,
+  "rain_mm": 61.8,
+  "tmax": 23.0,
+  "tmin": 14.0
+ },
+ "Barcelona": {
+  "gust_kmh": 34.0,
+  "rain_mm": 4.3,
+  "tmax": 24.0,
+  "tmin": 16.0
+ },
+ "Bello": {
+  "gust_kmh": 45.0,
+  "rain_mm": 7.4,
+  "tmax": 16.0,
+  "tmin": 7.0
+ },
+ "Benidorm": {
+  "gust_kmh": 34.0,
+  "rain_mm": 2.9,
+  "tmax": 23.0,
+  "tmin": 18.0
+ },
+ "Bielsa": {
+  "gust_kmh": 45.0,
+  "rain_mm": 41.7,
+  "tmax": 15.0,
+  "tmin": 8.0
+ },
+ "Bilbao": {
+  "gust_kmh": 30.0,
+  "rain_mm": 1.5,
+  "tmax": 20.0,
+  "tmin": 15.0
+ },
+ "Burgos": {
+  "gust_kmh": 44.0,
+  "rain_mm": 10.1,
+  "tmax": 16.0,
+  "tmin": 10.0
+ },
+ "Calamocha": {
+  "gust_kmh": 37.0,
+  "rain_mm": 5.6,
+  "tmax": 19.0,
+  "tmin": 9.0
+ },
+ "Cartagena": {
+  "gust_kmh": 38.0,
+  "rain_mm": 1.5,
+  "tmax": 24.0,
+  "tmin": 17.0
+ },
+ "Castellón": {
+  "gust_kmh": 32.0,
+  "rain_mm": 9.5,
+  "tmax": 24.0,
+  "tmin": 17.0
+ },
+ "Cervera de Pisuerga": {
+  "gust_kmh": 51.0,
+  "rain_mm": 16.3,
+  "tmax": 12.0,
+  "tmin": 8.0
+ },
+ "Ceuta": {
+  "gust_kmh": 75.0,
+  "rain_mm": 8.4,
+  "tmax": 23.0,
+  "tmin": 18.0
+ },
+ "Ciudad Real": {
+  "gust_kmh": 89.0,
+  "rain_mm": 21.3,
+  "tmax": 17.0,
+  "tmin": 11.0
+ },
+ "Ciutadella": {
+  "gust_kmh": 35.0,
+  "rain_mm": 1.2,
+  "tmax": 24.0,
+  "tmin": 18.0
+ },
+ "Cuenca": {
+  "gust_kmh": 82.0,
+  "rain_mm": 27.9,
+  "tmax": 14.0,
+  "tmin": 12.0
+ },
+ "Cáceres": {
+  "gust_kmh": 60.0,
+  "rain_mm": 46.5,
+  "tmax": 19.0,
+  "tmin": 13.0
+ },
+ "Cádiz": {
+  "gust_kmh": 97.0,
+  "rain_mm": 14.7,
+  "tmax": 23.0,
+  "tmin": 19.0
+ },
+ "Córdoba": {
+  "gust_kmh": 84.0,
+  "rain_mm": 17.6,
+  "tmax": 20.0,
+  "tmin": 14.0
+ },
+ "El Ejido": {
+  "gust_kmh": 31.0,
+  "rain_mm": 19.0,
+  "tmax": 25.0,
+  "tmin": 18.0
+ },
+ "Elche": {
+  "gust_kmh": 23.0,
+  "rain_mm": 3.0,
+  "tmax": 23.0,
+  "tmin": 15.0
+ },
+ "Ferrol": {
+  "gust_kmh": 34.0,
+  "rain_mm": 2.1,
+  "tmax": 19.0,
+  "tmin": 14.0
+ },
+ "Figueres": {
+  "gust_kmh": 17.0,
+  "rain_mm": 0.7,
+  "tmax": 23.0,
+  "tmin": 15.0
+ },
+ "Gandia": {
+  "gust_kmh": 30.0,
+  "rain_mm": 0.2,
+  "tmax": 24.0,
+  "tmin": 16.0
+ },
+ "Gijón": {
+  "gust_kmh": 23.0,
+  "rain_mm": 6.0,
+  "tmax": 21.0,
+  "tmin": 14.0
+ },
+ "Girona": {
+  "gust_kmh": 18.0,
+  "rain_mm": 1.4,
+  "tmax": 25.0,
+  "tmin": 16.0
+ },
+ "Granada": {
+  "gust_kmh": 85.0,
+  "rain_mm": 3.7,
+  "tmax": 21.0,
+  "tmin": 14.0
+ },
+ "Griegos": {
+  "gust_kmh": 62.0,
+  "rain_mm": 30.4,
+  "tmax": 10.0,
+  "tmin": 6.0
+ },
+ "Guadalajara": {
+  "gust_kmh": 66.0,
+  "rain_mm": 27.0,
+  "tmax": 16.0,
+  "tmin": 12.0
+ },
+ "Huelva": {
+  "gust_kmh": 97.0,
+  "rain_mm": 38.6,
+  "tmax": 23.0,
+  "tmin": 16.0
+ },
+ "Huesca": {
+  "gust_kmh": 49.0,
+  "rain_mm": 12.7,
+  "tmax": 20.0,
+  "tmin": 12.0
+ },
+ "Ibiza": {
+  "gust_kmh": 36.0,
+  "rain_mm": 1.2,
+  "tmax": 24.0,
+  "tmin": 17.0
+ },
+ "Irun": {
+  "gust_kmh": 45.0,
+  "rain_mm": 1.0,
+  "tmax": 22.0,
+  "tmin": 16.0
+ },
+ "Jaca": {
+  "gust_kmh": 35.0,
+  "rain_mm": 8.5,
+  "tmax": 18.0,
+  "tmin": 10.0
+ },
+ "Jaén": {
+  "gust_kmh": 84.0,
+  "rain_mm": 4.7,
+  "tmax": 20.0,
+  "tmin": 16.0
+ },
+ "Jerez de la Frontera": {
+  "gust_kmh": 93.0,
+  "rain_mm": 10.7,
+  "tmax": 22.0,
+  "tmin": 16.0
+ },
+ "La Gomera": {
+  "gust_kmh": 61.0,
+  "rain_mm": 0.9,
+  "tmax": 27.0,
+  "tmin": 23.0
+ },
+ "La Laguna": {
+  "gust_kmh": 68.0,
+  "rain_mm": 4.1,
+  "tmax": 26.0,
+  "tmin": 18.0
+ },
+ "Las Palmas": {
+  "gust_kmh": 44.0,
+  "rain_mm": 2.4,
+  "tmax": 28.0,
+  "tmin": 22.0
+ },
+ "León": {
+  "gust_kmh": 33.0,
+  "rain_mm": 17.2,
+  "tmax": 13.0,
+  "tmin": 10.0
+ },
+ "Linares": {
+  "gust_kmh": 69.0,
+  "rain_mm": 9.0,
+  "tmax": 19.0,
+  "tmin": 15.0
+ },
+ "Lleida": {
+  "gust_kmh": 22.0,
+  "rain_mm": 4.4,
+  "tmax": 22.0,
+  "tmin": 12.0
+ },
+ "Logroño": {
+  "gust_kmh": 34.0,
+  "rain_mm": 7.6,
+  "tmax": 21.0,
+  "tmin": 11.0
+ },
+ "Lorca": {
+  "gust_kmh": 36.0,
+  "rain_mm": 3.1,
+  "tmax": 21.0,
+  "tmin": 15.0
+ },
+ "Lugo": {
+  "gust_kmh": 28.0,
+  "rain_mm": 19.0,
+  "tmax": 15.0,
+  "tmin": 11.0
+ },
+ "Madrid": {
+  "gust_kmh": 42.0,
+  "rain_mm": 41.3,
+  "tmax": 17.0,
+  "tmin": 11.0
+ },
+ "Mahón": {
+  "gust_kmh": 39.0,
+  "rain_mm": 0.1,
+  "tmax": 22.0,
+  "tmin": 18.0
+ },
+ "Manresa": {
+  "gust_kmh": 27.0,
+  "rain_mm": 6.6,
+  "tmax": 23.0,
+  "tmin": 11.0
+ },
+ "Marbella": {
+  "gust_kmh": 50.0,
+  "rain_mm": 50.3,
+  "tmax": 22.0,
+  "tmin": 18.0
+ },
+ "Maspalomas": {
+  "gust_kmh": 78.0,
+  "rain_mm": 10.6,
+  "tmax": 22.0,
+  "tmin": 17.0
+ },
+ "Melilla": {
+  "gust_kmh": 64.0,
+  "rain_mm": 0.6,
+  "tmax": 28.0,
+  "tmin": 19.0
+ },
+ "Miranda de Ebro": {
+  "gust_kmh": 25.0,
+  "rain_mm": 7.2,
+  "tmax": 21.0,
+  "tmin": 10.0
+ },
+ "Mogán": {
+  "gust_kmh": 42.0,
+  "rain_mm": 2.8,
+  "tmax": 25.0,
+  "tmin": 21.0
+ },
+ "Molina de Aragón": {
+  "gust_kmh": 53.0,
+  "rain_mm": 14.5,
+  "tmax": 14.0,
+  "tmin": 9.0
+ },
+ "Montoro": {
+  "gust_kmh": 74.0,
+  "rain_mm": 19.9,
+  "tmax": 21.0,
+  "tmin": 13.0
+ },
+ "Morón de la Frontera": {
+  "gust_kmh": 97.0,
+  "rain_mm": 8.5,
+  "tmax": 22.0,
+  "tmin": 16.0
+ },
+ "Motril": {
+  "gust_kmh": 50.0,
+  "rain_mm": 32.5,
+  "tmax": 25.0,
+  "tmin": 17.0
+ },
+ "Murcia": {
+  "gust_kmh": 22.0,
+  "rain_mm": 0.8,
+  "tmax": 24.0,
+  "tmin": 15.0
+ },
+ "Málaga": {
+  "gust_kmh": 75.0,
+  "rain_mm": 36.1,
+  "tmax": 21.0,
+  "tmin": 17.0
+ },
+ "Mérida": {
+  "gust_kmh": 67.0,
+  "rain_mm": 43.3,
+  "tmax": 21.0,
+  "tmin": 14.0
+ },
+ "Naut Aran": {
+  "gust_kmh": 34.0,
+  "rain_mm": 7.0,
+  "tmax": 16.0,
+  "tmin": 7.0
+ },
+ "Navacerrada": {
+  "gust_kmh": 56.0,
+  "rain_mm": 55.0,
+  "tmax": 12.0,
+  "tmin": 9.0
+ },
+ "Ourense": {
+  "gust_kmh": 21.0,
+  "rain_mm": 33.0,
+  "tmax": 18.0,
+  "tmin": 11.0
+ },
+ "Oviedo": {
+  "gust_kmh": 21.0,
+  "rain_mm": 9.7,
+  "tmax": 19.0,
+  "tmin": 13.0
+ },
+ "Palencia": {
+  "gust_kmh": 31.0,
+  "rain_mm": 13.0,
+  "tmax": 14.0,
+  "tmin": 11.0
+ },
+ "Palma": {
+  "gust_kmh": 32.0,
+  "rain_mm": 0.3,
+  "tmax": 24.0,
+  "tmin": 18.0
+ },
+ "Pamplona": {
+  "gust_kmh": 26.0,
+  "rain_mm": 4.6,
+  "tmax": 17.0,
+  "tmin": 11.0
+ },
+ "Plasencia": {
+  "gust_kmh": 63.0,
+  "rain_mm": 34.1,
+  "tmax": 17.0,
+  "tmin": 13.0
+ },
+ "Ponferrada": {
+  "gust_kmh": 21.0,
+  "rain_mm": 12.4,
+  "tmax": 15.0,
+  "tmin": 8.0
+ },
+ "Pontevedra": {
+  "gust_kmh": 34.0,
+  "rain_mm": 19.8,
+  "tmax": 16.0,
+  "tmin": 13.0
+ },
+ "Puebla de Sanabria": {
+  "gust_kmh": 27.0,
+  "rain_mm": 24.6,
+  "tmax": 11.0,
+  "tmin": 7.0
+ },
+ "Puerto del Rosario": {
+  "gust_kmh": 58.0,
+  "rain_mm": 0.6,
+  "tmax": 28.0,
+  "tmin": 21.0
+ },
+ "Reinosa": {
+  "gust_kmh": 37.0,
+  "rain_mm": 8.1,
+  "tmax": 13.0,
+  "tmin": 7.0
+ },
+ "Reus": {
+  "gust_kmh": 42.0,
+  "rain_mm": 12.1,
+  "tmax": 24.0,
+  "tmin": 14.0
+ },
+ "Riaño": {
+  "gust_kmh": 33.0,
+  "rain_mm": 12.7,
+  "tmax": 12.0,
+  "tmin": 7.0
+ },
+ "Ronda": {
+  "gust_kmh": 79.0,
+  "rain_mm": 30.4,
+  "tmax": 18.0,
+  "tmin": 13.0
+ },
+ "Roquetas de Mar": {
+  "gust_kmh": 39.0,
+  "rain_mm": 14.5,
+  "tmax": 24.0,
+  "tmin": 18.0
+ },
+ "Salamanca": {
+  "gust_kmh": 38.0,
+  "rain_mm": 17.9,
+  "tmax": 15.0,
+  "tmin": 8.0
+ },
+ "Sallent de Gállego": {
+  "gust_kmh": 40.0,
+  "rain_mm": 17.8,
+  "tmax": 14.0,
+  "tmin": 6.0
+ },
+ "San Sebastián": {
+  "gust_kmh": 43.0,
+  "rain_mm": 1.6,
+  "tmax": 21.0,
+  "tmin": 16.0
+ },
+ "Santa Cruz de La Palma": {
+  "gust_kmh": 59.0,
+  "rain_mm": 10.9,
+  "tmax": 28.0,
+  "tmin": 20.0
+ },
+ "Santa Cruz de Tenerife": {
+  "gust_kmh": 68.0,
+  "rain_mm": 1.4,
+  "tmax": 29.0,
+  "tmin": 23.0
+ },
+ "Santander": {
+  "gust_kmh": 44.0,
+  "rain_mm": 3.5,
+  "tmax": 21.0,
+  "tmin": 17.0
+ },
+ "Santiago de Compostela": {
+  "gust_kmh": 49.0,
+  "rain_mm": 11.7,
+  "tmax": 16.0,
+  "tmin": 13.0
+ },
+ "Segovia": {
+  "gust_kmh": 37.0,
+  "rain_mm": 13.7,
+  "tmax": 15.0,
+  "tmin": 10.0
+ },
+ "Sevilla": {
+  "gust_kmh": 92.0,
+  "rain_mm": 20.3,
+  "tmax": 23.0,
+  "tmin": 16.0
+ },
+ "Soria": {
+  "gust_kmh": 37.0,
+  "rain_mm": 16.8,
+  "tmax": 17.0,
+  "tmin": 8.0
+ },
+ "Talavera de la Reina": {
+  "gust_kmh": 46.0,
+  "rain_mm": 60.4,
+  "tmax": 19.0,
+  "tmin": 12.0
+ },
+ "Tarifa": {
+  "gust_kmh": 95.0,
+  "rain_mm": 21.6,
+  "tmax": 23.0,
+  "tmin": 18.0
+ },
+ "Tarragona": {
+  "gust_kmh": 48.0,
+  "rain_mm": 11.8,
+  "tmax": 23.0,
+  "tmin": 15.0
+ },
+ "Teguise": {
+  "gust_kmh": 72.0,
+  "rain_mm": 6.1,
+  "tmax": 27.0,
+  "tmin": 20.0
+ },
+ "Teruel": {
+  "gust_kmh": 47.0,
+  "rain_mm": 12.1,
+  "tmax": 18.0,
+  "tmin": 12.0
+ },
+ "Toledo": {
+  "gust_kmh": 55.0,
+  "rain_mm": 26.6,
+  "tmax": 18.0,
+  "tmin": 13.0
+ },
+ "Torrelavega": {
+  "gust_kmh": 48.0,
+  "rain_mm": 6.7,
+  "tmax": 20.0,
+  "tmin": 16.0
+ },
+ "Tudela": {
+  "gust_kmh": 40.0,
+  "rain_mm": 9.4,
+  "tmax": 17.0,
+  "tmin": 13.0
+ },
+ "Valdelinares": {
+  "gust_kmh": 55.0,
+  "rain_mm": 10.9,
+  "tmax": 12.0,
+  "tmin": 7.0
+ },
+ "Valencia": {
+  "gust_kmh": 27.0,
+  "rain_mm": 3.9,
+  "tmax": 25.0,
+  "tmin": 17.0
+ },
+ "Valladolid": {
+  "gust_kmh": 27.0,
+  "rain_mm": 12.3,
+  "tmax": 15.0,
+  "tmin": 11.0
+ },
+ "Valverde": {
+  "gust_kmh": 77.0,
+  "rain_mm": 4.9,
+  "tmax": 23.0,
+  "tmin": 18.0
+ },
+ "Vielha": {
+  "gust_kmh": 38.0,
+  "rain_mm": 3.8,
+  "tmax": 18.0,
+  "tmin": 8.0
+ },
+ "Vigo": {
+  "gust_kmh": 36.0,
+  "rain_mm": 18.9,
+  "tmax": 17.0,
+  "tmin": 15.0
+ },
+ "Villablino": {
+  "gust_kmh": 33.0,
+  "rain_mm": 12.6,
+  "tmax": 16.0,
+  "tmin": 5.0
+ },
+ "Vitoria": {
+  "gust_kmh": 33.0,
+  "rain_mm": 4.4,
+  "tmax": 17.0,
+  "tmin": 11.0
+ },
+ "Zamora": {
+  "gust_kmh": 25.0,
+  "rain_mm": 24.2,
+  "tmax": 15.0,
+  "tmin": 10.0
+ },
+ "Zaragoza": {
+  "gust_kmh": 34.0,
+  "rain_mm": 8.2,
+  "tmax": 21.0,
+  "tmin": 14.0
+ },
+ "Ávila": {
+  "gust_kmh": 52.0,
+  "rain_mm": 18.3,
+  "tmax": 13.0,
+  "tmin": 8.0
+ },
+ "Écija": {
+  "gust_kmh": 74.0,
+  "rain_mm": 8.1,
+  "tmax": 21.0,
+  "tmin": 14.0
+ }
+}
