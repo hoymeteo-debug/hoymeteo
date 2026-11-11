@@ -50,8 +50,8 @@ def test_carrusel_y_publicacion():
     posts = [c for c in s.calls if c[0] == "POST"]
     assert posts[0][2] == {"image_url": "https://x/1.jpg", "is_carousel_item": "true"}
     assert posts[2][2] == {"media_type": "CAROUSEL", "children": "c1,c2", "caption": "texto"}
-    # el carrusel se crea sin consultar antes cada imagen
-    assert not [c for c in s.calls if c[0] == "GET" and c[1] in ("c1", "c2")]
+    # se comprueba cada imagen antes de crear el carrusel
+    assert [c[1] for c in s.calls if c[0] == "GET"][:2] == ["c1", "c2"]
     assert client.publish(parent) == "post1"
 
 

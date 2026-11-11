@@ -63,9 +63,11 @@ class Instagram:
                 continue
             if r.status_code != 200 or "error" in body:
                 err = body.get("error", {})
+                detail = " · ".join(x for x in (err.get("error_user_title"), err.get("error_user_msg")) if x)
                 raise InstagramError(
                     f"HTTP {r.status_code} en {path.split('?')[0]}: {err.get('message', r.text[:200])}"
-                    f" (code {err.get('code')}, subcode {err.get('error_subcode')})")
+                    f" (code {err.get('code')}, subcode {err.get('error_subcode')})"
+                    + (f" — {detail}" if detail else ""))
             return body
         raise InstagramError(f"Demasiados reintentos en {path}")
 
@@ -151,14 +153,12 @@ class Instagram:
         if not 2 <= len(image_urls) <= 10:
             raise InstagramError(f"Un carrusel necesita de 2 a 10 imágenes (hay {len(image_urls)})")
         children = [self._container(image_url=u, is_carousel_item="true") for u in image_urls]
-        # Las imágenes suelen estar listas al momento: se intenta crear el carrusel directamente
-        # y solo si Instagram aún no las tiene se espera a cada una (ahorra muchas llamadas).
-        try:
-            parent = self._container(media_type="CAROUSEL", children=",".join(children), caption=caption)
-        except InstagramError:
-            for c in children:
-                self.wait_ready(c)
-            parent = self._container(media_type="CAROUSEL", children=",".join(children), caption=caption)
+        # Cada imagen debe estar terminada antes de crear el carrusel (si no, Meta deja publicar
+        # el contenedor pero falla al final con «Fatal», subcódigo 2207085). Las imágenes suelen
+        # estar listas a la primera consulta, así que cuesta una llamada por imagen.
+        for c in children:
+            self.wait_ready(c)
+        parent = self._container(media_type="CAROUSEL", children=",".join(children), caption=caption)
         self.wait_ready(parent)
         return parent
 
