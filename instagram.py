@@ -57,11 +57,12 @@ class Instagram:
             if r.status_code >= 500 and attempt < 3:
                 time.sleep(5 * attempt)
                 continue
-            if body.get("error", {}).get("code") in self.RATE_LIMIT_CODES and attempt < 5:
+            err_code = body.get("error", {}).get("code") if isinstance(body, dict) else None
+            if err_code in self.RATE_LIMIT_CODES and attempt < 5:
                 # Se ha agotado el cupo de llamadas: esperar y reintentar (90 s, 180 s, 270 s, 360 s)
                 time.sleep(self.rate_wait * attempt)
                 continue
-            if r.status_code != 200 or "error" in body:
+            if r.status_code != 200 or (isinstance(body, dict) and "error" in body):
                 err = body.get("error", {})
                 detail = " · ".join(x for x in (err.get("error_user_title"), err.get("error_user_msg")) if x)
                 raise InstagramError(
