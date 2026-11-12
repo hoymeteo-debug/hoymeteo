@@ -192,6 +192,7 @@ class Instagram:
         mira el contenedor: PUBLISHED = hecho. Solo se vuelve a intentar si sigue sin publicar
         (FINISHED) y el error fue de cupo de llamadas."""
         last = None
+        before = self._latest_ids()
         for attempt in range(1, 5):
             try:
                 return self._call("POST", f"{self.resolve_user_id()}/media_publish", once=True,
@@ -199,12 +200,25 @@ class Instagram:
             except InstagramError as exc:
                 last = exc
             status = self._status_after_error(container_id)
-            if status == "PUBLISHED":
+            if status == "PUBLISHED" or self._latest_ids() != before:
+                # 12-nov-2026: Meta dijo «acción bloqueada» y el contenedor seguía FINISHED, pero la
+                # publicación salió; por eso también se mira si ha aparecido algo nuevo en la cuenta.
                 return container_id  # publicado (Meta no devuelve el id de la publicación)
             if status != "FINISHED" or last.code not in self.RATE_LIMIT_CODES:
                 raise last
             time.sleep(self.rate_wait * attempt)
         raise last
+
+    def _latest_ids(self):
+        """Id de la última publicación del feed y de la última story (para detectar si salió)."""
+        uid, ids = self.resolve_user_id(), []
+        for edge in ("media", "stories"):
+            try:
+                data = self._call("GET", f"{uid}/{edge}", fields="id", limit=1).get("data") or [{}]
+                ids.append(data[0].get("id"))
+            except (InstagramError, AttributeError, IndexError):
+                ids.append(None)
+        return tuple(ids)
 
     def _status_after_error(self, container_id):
         """Estado del contenedor tras un error al publicar (Meta tarda unos segundos en marcarlo)."""

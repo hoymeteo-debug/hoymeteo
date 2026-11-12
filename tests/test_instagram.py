@@ -127,5 +127,32 @@ class LimitedSession(FakeSession):
 def test_reintenta_si_se_agota_el_cupo():
     client = ig(LimitedSession())
     assert client.publish("c9") == "post1"
-    # 3 intentos de publicar + 3 consultas de estado tras cada uno de los 2 errores
-    assert client.calls == 9
+    # 3 intentos de publicar + 3 consultas de estado y 2 de «últimas publicaciones» por cada uno
+    # de los 2 errores + 2 consultas iniciales
+    assert client.calls == 15
+
+
+class BlockedButPublishedSession(FakeSession):
+    """«Acción bloqueada» (code 4) aunque la publicación sale; el contenedor sigue FINISHED."""
+
+    def __init__(self):
+        super().__init__()
+        self.posts = 0
+
+    def request(self, method, url, params=None, data=None, timeout=None):
+        path = url.split("/v23.0/")[1]
+        if path.endswith("/media_publish"):
+            self.posts += 1
+            return FakeResponse({"error": {"message": "Application request limit reached", "code": 4,
+                                           "error_subcode": 2207051}}, 403)
+        if method == "GET" and path == "1789/media":
+            return FakeResponse({"data": [{"id": f"m{self.posts}"}]})
+        if method == "GET" and path == "1789/stories":
+            return FakeResponse({"data": []})
+        return super().request(method, url, params, data, timeout)
+
+
+def test_bloqueo_falso_no_duplica():
+    s = BlockedButPublishedSession()
+    assert ig(s).publish("c3") == "c3"
+    assert s.posts == 1
